@@ -9,8 +9,16 @@
 <body>
 <header>
   <h1>Mindmap App</h1>
+  <nav>
+    <ul>
+      <li>File</li>
+      <li>Edit</li>
+      <li>View</li>
+    </ul>
+  </nav>
 </header>
 <main>
+  <!-- Toolbar
   <div id="toolbar">
     <button id="add-node">Add Node</button>
     <button id="remove-node">Remove Node</button>
@@ -21,15 +29,21 @@
     <button id="disconnect-nodes">Disconnect Nodes</button>
     <button id="auto-layer">Auto Layer</button>
   </div>
+   -->
   <div id="canvas-container">
-    <canvas id="mindmap-canvas" width="800" height="600"></canvas>
+    <canvas id="mindmap-canvas"></canvas>
   </div>
 </main>
 <div id="context-menu" style="display: none; position: absolute;">
   <ul>
     <li id="create-node">Create Node</li>
+  </ul>
+</div>
+<div id="context-menu-on-node" style="display: none; position: absolute;">
+  <ul>
     <li id="delete-node">Delete Node</li>
     <li id="edit-node">Edit Node</li>
+    <li id="connect-nodes">Connect Nodes</li>
   </ul>
 </div>
 

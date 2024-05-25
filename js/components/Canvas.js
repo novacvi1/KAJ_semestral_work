@@ -16,6 +16,11 @@ class Canvas {
     this.mindmap.nodes.forEach((node, index) => {
       node.zIndex = index;
     });
+    // Set the canvas's width and height attributes to match its display size
+    this.resizeCanvas();
+
+    // Add an event listener to resize the canvas whenever the window is resized
+    window.addEventListener('resize', () => this.resizeCanvas());
   }
 
   initEvents() {
@@ -49,16 +54,22 @@ class Canvas {
   }
 
   showContextMenu() {
-    const contextMenu = document.getElementById('context-menu');
+    let contextMenu = document.getElementById('context-menu');
+    if (this.selectedNode) {
+      contextMenu = document.getElementById('context-menu-on-node');
+    }
     contextMenu.style.display = 'block';
     contextMenu.style.left = `${this.contextMenuX}px`;
     contextMenu.style.top = `${this.contextMenuY}px`;
     this.contextMenuVisible = true;
+    console.log('Context Menu:', this.contextMenuX, this.contextMenuY);
   }
 
   hideContextMenu() {
     const contextMenu = document.getElementById('context-menu');
+    const contextMenuOnNode = document.getElementById('context-menu-on-node');
     contextMenu.style.display = 'none';
+    contextMenuOnNode.style.display = 'none';
     this.contextMenuVisible = false;
   }
 
@@ -67,6 +78,7 @@ class Canvas {
 
     if (targetId === 'create-node') {
       this.selectedNode = this.mindmap.addNode('New Node', this.contextMenuX, this.contextMenuY);
+      console.log('Selected Node:', this.selectedNode);
       this.render();
     } else if (targetId === 'delete-node' && this.selectedNode) {
       this.mindmap.removeNode(this.selectedNode);
@@ -78,11 +90,30 @@ class Canvas {
         this.selectedNode.text = newText;
         this.render();
       }
+    } else if (targetId === 'connect-nodes') {
+      this.isConnectingNodes = true;
+    } else if (targetId === 'auto-layer') {
+      this.autoLayer();
     }
 
     this.hideContextMenu();
   }
 
+  autoLayer() {
+    const nodes = this.mindmap.nodes;
+    nodes.sort((a, b) => {
+      if (a.y === b.y) {
+        return a.x - b.x;
+      }
+      return a.y - b.y;
+    });
+
+    nodes.forEach((node, index) => {
+      node.zIndex = index;
+    });
+
+    this.render();
+  }
 
   onKeyDown(e) {
     if (e.key === 'Delete' || e.key === 'Backspace') {
@@ -104,8 +135,11 @@ class Canvas {
   }
 
   onMouseDown(e) {
-    const x = e.offsetX;
-    const y = e.offsetY;
+    const rect = this.canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    console.log('Mouse click coordinates:', e.clientX, e.clientY);
+    console.log('Canvas coordinates:', rect.left, rect.top);
 
     const clickedNodes = this.mindmap.nodes
       .filter(node => this.isPointInNode(x, y, node))
@@ -114,17 +148,17 @@ class Canvas {
       this.selectedNode = clickedNodes[0];
       this.selectedNode.zIndex = this.mindmap.nodes.length;
       this.isDrawing = true;
-      this.startX = x - selectedNode.x;
-      this.startY = y - selectedNode.y;
+      this.startX = x - clickedNodes[0].x;
+      this.startY = y - clickedNodes[0].y;
 
       if (this.isConnectingNodes) {
         if (this.nodeToConnect) {
-          this.mindmap.connectNodes(this.nodeToConnect, selectedNode);
+          this.mindmap.connectNodes(this.nodeToConnect, clickedNodes[0]);
           this.isConnectingNodes = false;
           this.nodeToConnect = null;
 
         } else {
-          this.nodeToConnect = selectedNode;
+          this.nodeToConnect = clickedNodes[0];
         }
       }
     } else {
@@ -145,8 +179,12 @@ class Canvas {
   }
 
   onDoubleClick(e) {
-    const x = e.offsetX;
-    const y = e.offsetY;
+    const rect = this.canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    console.log('Mouse click coordinates:', e.clientX, e.clientY);
+    console.log('Canvas coordinates:', rect.left, rect.top);
+    console.log('x:', x, 'y:', y);
 
     const clickedNode = this.mindmap.nodes.find(node => this.isPointInNode(x, y, node));
     let inputField = document.createElement('input');
@@ -220,6 +258,13 @@ class Canvas {
         this.ctx.fillRect(node.x, node.y, node.width, node.height);
       }
     });
+  }
+
+  // To change the size of the canvas when the window is resized
+  resizeCanvas() {
+    this.canvas.width = this.canvas.offsetWidth;
+    this.canvas.height = this.canvas.offsetHeight;
+    this.render();
   }
 }
 

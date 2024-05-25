@@ -4,8 +4,8 @@ class Node {
     this.text = text;
     this.x = x;
     this.y = y;
-    this.width = 150;
-    this.height = 80;
+    this.width = 75;
+    this.height = 40;
     this.rotation = 0;
     this.zIndex = 0;
   }

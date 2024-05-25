@@ -68,23 +68,43 @@ main {
   height: 100%;
 }
 
-#context-menu {
+#context-menu, #context-menu-on-node {
   background-color: #fff;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
-  padding: 10px;
 }
 
-#context-menu ul {
+#context-menu ul, #context-menu-on-node ul{
   list-style-type: none;
 }
 
-#context-menu li {
+#context-menu li, #context-menu-on-node li{
   padding: 5px 10px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
-#context-menu li:hover {
+#context-menu li:hover, #context-menu-on-node li:hover{
   background-color: #f7f7f7;
+}
+
+header nav {
+  background-color: #333;
+  color: #fff;
+  padding: 10px;
+}
+
+header nav ul {
+  list-style-type: none;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+header nav li {
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+header nav li:hover {
+  color: #ccc;
 }
