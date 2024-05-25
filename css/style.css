@@ -243,5 +243,42 @@ textarea {
   h3 {
     page-break-after: avoid;
   }
+
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+
+  header {
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    text-align: center;
+  }
+
+  main {
+    display: flex;
+    flex-direction: row;
+    height: calc(100vh - 56px); /* subtract header height */
+  }
+
+  #toolbar {
+    background-color: #eee;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  #canvas-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #mindmap-canvas {
+    border: 1px solid #333;
+  }
 }
 
