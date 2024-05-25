@@ -45,7 +45,9 @@ class Canvas {
 
     const clickedNode = this.mindmap.nodes.find(node => this.isPointInNode(x, y, node));
     if (clickedNode) {
-      this.selectedNode = clickedNode;
+      if (this.selectedNode !== clickedNode) {
+        this.selectedNode = clickedNode;
+      }
       this.isDrawing = true;
       this.startX = x - clickedNode.x;
       this.startY = y - clickedNode.y;
@@ -55,15 +57,19 @@ class Canvas {
           this.mindmap.connectNodes(this.nodeToConnect, clickedNode);
           this.isConnectingNodes = false;
           this.nodeToConnect = null;
-          this.render();
+
         } else {
           this.nodeToConnect = clickedNode;
         }
       }
-    } else if (this.isConnectingNodes) {
-      this.isConnectingNodes = false;
-      this.nodeToConnect = null;
+    } else {
+      this.selectedNode = null;
+      if (this.isConnectingNodes) {
+        this.isConnectingNodes = false;
+        this.nodeToConnect = null;
+      }
     }
+    this.render();
   }
 
   onMouseUp() {
@@ -109,11 +115,11 @@ class Canvas {
 
     this.mindmap.nodes.forEach(node => {
 
+      node.render(this.ctx);
       if (node === this.selectedNode) {
         this.ctx.fillStyle = 'rgba(255, 165, 0, 0.2)';
         this.ctx.fillRect(node.x, node.y, node.width, node.height);
       }
-      node.render(this.ctx);
     });
 
     this.mindmap.connectors.forEach(connector => connector.render(this.ctx));
