@@ -10,6 +10,9 @@ class Canvas {
     this.isConnectingNodes = false;
     this.nodeToConnect = null;
     this.editingNode = null;
+    this.contextMenuVisible = false;
+    this.contextMenuX = 0;
+    this.contextMenuY = 0;
   }
 
   initEvents() {
@@ -18,7 +21,65 @@ class Canvas {
     this.canvas.addEventListener('mouseup', this.onMouseUp.bind(this));
     this.canvas.addEventListener('keydown', this.onKeyDown.bind(this));
     this.canvas.addEventListener('dblclick', this.onDoubleClick.bind(this));
+    this.canvas.addEventListener('contextmenu', this.onContextMenu.bind(this));
+    document.getElementById('context-menu').addEventListener('click', this.onContextMenuClick.bind(this));
+    window.addEventListener('click', this.onWindowClick.bind(this));
   }
+
+  onContextMenu(e) {
+    e.preventDefault();
+
+    const x = e.offsetX;
+    const y = e.offsetY;
+    const clickedNode = this.mindmap.nodes.find(node => this.isPointInNode(x, y, node));
+
+    if (clickedNode) {
+      this.selectedNode = clickedNode;
+    } else {
+      this.selectedNode = null;
+    }
+
+    this.contextMenuX = e.clientX;
+    this.contextMenuY = e.clientY;
+    this.showContextMenu();
+    this.render();
+  }
+
+  showContextMenu() {
+    const contextMenu = document.getElementById('context-menu');
+    contextMenu.style.display = 'block';
+    contextMenu.style.left = `${this.contextMenuX}px`;
+    contextMenu.style.top = `${this.contextMenuY}px`;
+    this.contextMenuVisible = true;
+  }
+
+  hideContextMenu() {
+    const contextMenu = document.getElementById('context-menu');
+    contextMenu.style.display = 'none';
+    this.contextMenuVisible = false;
+  }
+
+  onContextMenuClick(e) {
+    const targetId = e.target.id;
+
+    if (targetId === 'create-node') {
+      this.selectedNode = this.mindmap.addNode('New Node', this.contextMenuX, this.contextMenuY);
+      this.render();
+    } else if (targetId === 'delete-node' && this.selectedNode) {
+      this.mindmap.removeNode(this.selectedNode);
+      this.selectedNode = null;
+      this.render();
+    } else if (targetId === 'edit-node' && this.selectedNode) {
+      const newText = prompt('Enter new text:', this.selectedNode.text);
+      if (newText !== null) {
+        this.selectedNode.text = newText;
+        this.render();
+      }
+    }
+
+    this.hideContextMenu();
+  }
+
 
   onKeyDown(e) {
     if (e.key === 'Delete' || e.key === 'Backspace') {
@@ -84,17 +145,49 @@ class Canvas {
     const y = e.offsetY;
 
     const clickedNode = this.mindmap.nodes.find(node => this.isPointInNode(x, y, node));
+    let inputField = document.createElement('input');
+    inputField.style.position = 'absolute';
+
     if (clickedNode) {
-      this.editingNode = clickedNode;
-      const newText = prompt('Enter new text:', clickedNode.text);
-      if (newText !== null) {
-        clickedNode.text = newText;
-        this.render();
-      }
-      this.editingNode = null;
-    } else if (!this.isConnectingNodes) {
+      inputField.style.left = `${clickedNode.x + clickedNode.width / 2 - inputField.offsetWidth / 2}px`;
+      inputField.style.top = `${clickedNode.y + clickedNode.height / 2 - inputField.offsetHeight / 2}px`;
+      inputField.value = clickedNode.text;
+    } else {
       const newNode = this.mindmap.addNode('New Node', x, y);
       this.render();
+      inputField.style.left = `${newNode.x + newNode.width / 2 - inputField.offsetWidth / 2}px`;
+      inputField.style.top = `${newNode.y + newNode.height / 2 - inputField.offsetHeight / 2}px`;
+      inputField.value = newNode.text;
+    }
+
+    this.canvas.parentNode.appendChild(inputField);
+    inputField.focus();
+
+    inputField.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        if (clickedNode) {
+          clickedNode.text = inputField.value;
+        } else {
+          newNode.text = inputField.value;
+        }
+        this.canvas.parentNode.removeChild(inputField);
+        this.render();
+      }
+    });
+
+    inputField.addEventListener('blur', () => {
+      this.canvas.parentNode.removeChild(inputField);
+    });
+  }
+
+  onWindowClick(e) {
+    if (!this.contextMenuVisible) return;
+
+    const contextMenu = document.getElementById('context-menu');
+    const isClickInsideContextMenu = contextMenu.contains(e.target);
+
+    if (!isClickInsideContextMenu) {
+      this.hideContextMenu();
     }
   }
 
