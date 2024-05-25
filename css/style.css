@@ -108,3 +108,32 @@ header nav li {
 header nav li:hover {
   color: #ccc;
 }
+
+/* Canvas Placeholder */
+#guide-message {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-size: 16px;
+  color: rgba(128, 128, 128, 0.5);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Text node input */
+.node-input {
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px; /* Adjust to match the text size of your nodes */
+  color: #333; /* Adjust to match the text color of your nodes */
+  background-color: #f7f7f7; /* Adjust to match the background color of your nodes */
+  border: none; /* Remove border */
+  /* TODO make field in center */
+  width: 200px; /* Fill the width of the input field */
+  max-width: 200px; /* Limit the width of the input field */
+}

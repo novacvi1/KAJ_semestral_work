@@ -1,10 +1,17 @@
+const tempDiv = document.createElement('div');
+tempDiv.className = 'node-text';
+tempDiv.style.display = 'none';
+document.body.appendChild(tempDiv);
+const computedStyles = window.getComputedStyle(tempDiv);
+
+
 class Node {
   constructor(text = 'New Node', x = 0, y = 0) {
     this.id = Date.now();
     this.text = text;
     this.x = x;
     this.y = y;
-    this.width = 75;
+    this.width = 100;
     this.height = 40;
     this.rotation = 0;
     this.zIndex = 0;
@@ -18,6 +25,8 @@ class Node {
     ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
     ctx.strokeStyle = '#000';
     ctx.strokeRect(-this.width / 2, -this.height / 2, this.width, this.height);
+    ctx.font = computedStyles.fontSize + ' ' + computedStyles.fontFamily;
+    ctx.fillStyle = computedStyles.color;
     ctx.fillStyle = '#000';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
