@@ -9,6 +9,7 @@ class Toolbar {
     this.loadButton = document.getElementById('load-map');
     this.connectNodesButton = document.getElementById('connect-nodes');
     this.deleteNodeButton = document.getElementById('delete-node');
+    this.autoLayerButton = document.getElementById('auto-layer');
   }
 
   initEvents() {
@@ -18,6 +19,7 @@ class Toolbar {
     this.loadButton.addEventListener('click', this.onLoadClick.bind(this));
     this.connectNodesButton.addEventListener('click', this.onConnectNodesClick.bind(this));
     this.deleteNodeButton.addEventListener('click', this.onDeleteNodeClick.bind(this));
+    this.autoLayerButton.addEventListener('click', this.onAutoLayerClick.bind(this));
   }
 
   onAddNodeClick() {
@@ -58,6 +60,22 @@ class Toolbar {
       this.canvas.selectedNode = null;
       this.canvas.render();
     }
+  }
+
+  onAutoLayerClick() {
+    const nodes = this.mindmap.nodes;
+    nodes.sort((a, b) => {
+      if (a.y === b.y) {
+        return a.x - b.x;
+      }
+      return a.y - b.y;
+    });
+
+    nodes.forEach((node, index) => {
+      node.zIndex = index;
+    });
+
+    this.canvas.render();
   }
 
 }

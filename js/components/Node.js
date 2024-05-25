@@ -7,6 +7,7 @@ class Node {
     this.width = 150;
     this.height = 80;
     this.rotation = 0;
+    this.zIndex = 0;
   }
 
   render(ctx) {
@@ -54,6 +55,20 @@ class Node {
     this.height = data.height;
     this.rotation = data.rotation;
     return this;
+  }
+
+  renderConnections(ctx, connectors) {
+    connectors.forEach(connector => {
+      if (connector.node1 === this || connector.node2 === this) {
+        ctx.beginPath();
+        ctx.moveTo(this.x + this.width / 2, this.y + this.height / 2);
+        const otherNode = connector.node1 === this ? connector.node2 : connector.node1;
+        ctx.lineTo(otherNode.x + otherNode.width / 2, otherNode.y + otherNode.height / 2);
+        ctx.strokeStyle = connector.color;
+        ctx.lineWidth = connector.width;
+        ctx.stroke();
+      }
+    });
   }
 }
 

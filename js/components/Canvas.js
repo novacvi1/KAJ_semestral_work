@@ -13,6 +13,9 @@ class Canvas {
     this.contextMenuVisible = false;
     this.contextMenuX = 0;
     this.contextMenuY = 0;
+    this.mindmap.nodes.forEach((node, index) => {
+      node.zIndex = index;
+    });
   }
 
   initEvents() {
@@ -104,23 +107,24 @@ class Canvas {
     const x = e.offsetX;
     const y = e.offsetY;
 
-    const clickedNode = this.mindmap.nodes.find(node => this.isPointInNode(x, y, node));
-    if (clickedNode) {
-      if (this.selectedNode !== clickedNode) {
-        this.selectedNode = clickedNode;
-      }
+    const clickedNodes = this.mindmap.nodes
+      .filter(node => this.isPointInNode(x, y, node))
+      .sort((a, b) => b.zIndex - a.zIndex);
+    if (clickedNodes.length > 0) {
+      this.selectedNode = clickedNodes[0];
+      this.selectedNode.zIndex = this.mindmap.nodes.length;
       this.isDrawing = true;
-      this.startX = x - clickedNode.x;
-      this.startY = y - clickedNode.y;
+      this.startX = x - selectedNode.x;
+      this.startY = y - selectedNode.y;
 
       if (this.isConnectingNodes) {
         if (this.nodeToConnect) {
-          this.mindmap.connectNodes(this.nodeToConnect, clickedNode);
+          this.mindmap.connectNodes(this.nodeToConnect, selectedNode);
           this.isConnectingNodes = false;
           this.nodeToConnect = null;
 
         } else {
-          this.nodeToConnect = clickedNode;
+          this.nodeToConnect = selectedNode;
         }
       }
     } else {
@@ -209,13 +213,13 @@ class Canvas {
     this.mindmap.nodes.forEach(node => {
 
       node.render(this.ctx);
+      node.renderConnections(this.ctx, this.mindmap.connectors);
+
       if (node === this.selectedNode) {
         this.ctx.fillStyle = 'rgba(255, 165, 0, 0.2)';
         this.ctx.fillRect(node.x, node.y, node.width, node.height);
       }
     });
-
-    this.mindmap.connectors.forEach(connector => connector.render(this.ctx));
   }
 }
 
