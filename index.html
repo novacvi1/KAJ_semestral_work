@@ -11,9 +11,10 @@
   <h1>Mindmap App</h1>
   <nav>
     <ul>
-      <li>File</li>
-      <li>Edit</li>
-      <li>View</li>
+      <li id="new-map">New</li>
+      <li id="save-map">Save</li>
+      <li id="load-map">Load</li>
+      <li id="info-button">ℹ️</li>
     </ul>
   </nav>
 </header>
@@ -48,6 +49,13 @@
     <li id="edit-node">Edit Node</li>
     <li id="connect-nodes">Connect Nodes</li>
   </ul>
+</div>
+<div id="info-popup">
+  <section id="close-popup">✖️</section>
+  <h3>How to use Mindmap App</h3>
+  <p>Double-click on canvas to create a new node.</p>
+  <p>Drag and drop to move nodes.</p>
+  <p>Right-click for more options.</p>
 </div>
 <script type="module" src="js/app.js"></script>
 </body>

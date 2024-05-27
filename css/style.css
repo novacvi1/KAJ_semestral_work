@@ -135,3 +135,29 @@ header nav li:hover {
   padding-inline: 5px; /* Adjust to match the padding of your nodes */
   max-width: 200px; /* Limit the width of the input field */
 }
+
+#info-popup {
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.8s ease;
+}
+
+#close-popup {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  cursor: pointer;
+}
+
+#info-popup.show {
+  opacity: 1;
+  pointer-events: auto;
+}
