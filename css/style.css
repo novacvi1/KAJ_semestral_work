@@ -132,8 +132,6 @@ header nav li:hover {
   font-size: 16px; /* Adjust to match the text size of your nodes */
   color: #333; /* Adjust to match the text color of your nodes */
   background-color: #f7f7f7; /* Adjust to match the background color of your nodes */
-  border: none; /* Remove border */
-  /* TODO make field in center */
-  width: 200px; /* Fill the width of the input field */
+  padding-inline: 5px; /* Adjust to match the padding of your nodes */
   max-width: 200px; /* Limit the width of the input field */
 }
