@@ -57,6 +57,55 @@
   <p>Drag and drop to move nodes.</p>
   <p>Right-click for more options.</p>
 </div>
+<div id="loading-screen">
+  <div id="logo">
+    <svg width="200" height="230" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+
+      <!-- Central Node -->
+      <circle cx="100" cy="100" r="10" fill="#4CAF50" class="pulse"/>
+
+      <!-- Branches -->
+      <!-- Top Right Branch -->
+      <line x1="100" y1="100" x2="140" y2="60" stroke="#4CAF50" stroke-width="2"/>
+      <circle cx="140" cy="60" r="7" fill="#FFC107"/>
+      <line x1="140" y1="60" x2="160" y2="30" stroke="#FFC107" stroke-width="2"/>
+      <circle cx="160" cy="30" r="5" fill="#FF5722"/>
+
+      <!-- Top Left Branch -->
+      <line x1="100" y1="100" x2="60" y2="60" stroke="#4CAF50" stroke-width="2"/>
+      <circle cx="60" cy="60" r="7" fill="#FFC107"/>
+      <line x1="60" y1="60" x2="40" y2="30" stroke="#FFC107" stroke-width="2"/>
+      <circle cx="40" cy="30" r="5" fill="#FF5722"/>
+
+      <!-- Bottom Right Branch -->
+      <line x1="100" y1="100" x2="140" y2="140" stroke="#4CAF50" stroke-width="2"/>
+      <circle cx="140" cy="140" r="7" fill="#FFC107"/>
+      <line x1="140" y1="140" x2="160" y2="170" stroke="#FFC107" stroke-width="2"/>
+      <circle cx="160" cy="170" r="5" fill="#FF5722"/>
+
+      <!-- Bottom Left Branch -->
+      <line x1="100" y1="100" x2="60" y2="140" stroke="#4CAF50" stroke-width="2"/>
+      <circle cx="60" cy="140" r="7" fill="#FFC107"/>
+      <line x1="60" y1="140" x2="40" y2="170" stroke="#FFC107" stroke-width="2"/>
+      <circle cx="40" cy="170" r="5" fill="#FF5722"/>
+
+      <!-- Top Branch -->
+      <line x1="100" y1="100" x2="100" y2="50" stroke="#4CAF50" stroke-width="2"/>
+      <circle cx="100" cy="50" r="7" fill="#FFC107"/>
+      <line x1="100" y1="50" x2="100" y2="20" stroke="#FFC107" stroke-width="2"/>
+      <circle cx="100" cy="20" r="5" fill="#FF5722"/>
+
+      <!-- Bottom Branch -->
+      <line x1="100" y1="100" x2="100" y2="150" stroke="#4CAF50" stroke-width="2"/>
+      <circle cx="100" cy="150" r="7" fill="#FFC107"/>
+      <line x1="100" y1="150" x2="100" y2="180" stroke="#FFC107" stroke-width="2"/>
+      <circle cx="100" cy="180" r="5" fill="#FF5722"/>
+
+      <!-- Text under it -->
+      <text x="50%" y="100%" text-anchor="middle" stroke="black" stroke-width="1px" dy=".3em">Mindmap App</text>
+    </svg>
+  </div>
+</div>
 <script type="module" src="js/app.js"></script>
 </body>
 </html>

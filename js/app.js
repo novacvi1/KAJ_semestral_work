@@ -39,3 +39,11 @@ document.addEventListener('click', (event) => {
     infoPopup.classList.remove('show');
   }
 });
+
+// Loading screen
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const loadingScreen = document.getElementById('loading-screen');
+    loadingScreen.classList.add('hide');
+  }, 1000);
+});

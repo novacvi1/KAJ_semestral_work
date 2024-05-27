@@ -34,6 +34,7 @@ class Node {
     ctx.restore();
   }
 
+
   move(x, y) {
     this.x = x;
     this.y = y;
