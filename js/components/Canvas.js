@@ -128,9 +128,9 @@ class Canvas {
   }
 
   isHidden() {
-    try {
-      return this.inputField.inputField.hidden;
-    } catch (e) {
+    if (this.inputField && this.inputField.inputField) {
+      return this.inputField.inputField !== document.activeElement;
+    } else {
       return true;
     }
   }
@@ -244,6 +244,9 @@ class Canvas {
     if (e.key === 'Escape') {
       this.onInputFieldBlur()
     }
+
+    // Remove the input event listener when the input field is removed
+    this.inputField.inputField.removeEventListener('input', this.inputField.inputField.oninput);
   }
 
   onInputFieldBlur() {
@@ -262,6 +265,12 @@ class Canvas {
     );
 
     this.inputField.focus();
+
+    // Add an input event listener to resize the node when the input field's value changes
+    this.inputField.inputField.addEventListener('input', () => {
+      this.selectedNode.text = this.inputField.getValue();
+      this.render();
+    });
   }
 
   newMap() {

@@ -124,17 +124,24 @@ header nav li:hover {
   color: rgba(128, 128, 128, 0.5);
   pointer-events: none;
   user-select: none;
+  padding: 20px;
 }
 
 /* Text node input */
 .node-input {
   font-family: 'Poppins', sans-serif;
-  font-size: 16px; /* Adjust to match the text size of your nodes */
-  color: #333; /* Adjust to match the text color of your nodes */
-  background-color: #f7f7f7; /* Adjust to match the background color of your nodes */
-  padding-inline: 5px; /* Adjust to match the padding of your nodes */
-  max-width: 200px; /* Limit the width of the input field */
+  font-size: 16px;
+  color: #333;
+  background-color: #f7f7f7;
+  padding-inline: 5px;
+  max-width: 200px;
 }
+
+.node-text {
+  word-wrap: break-word;
+  line-height: 1.2; /* Adjust as needed */
+}
+
 
 #info-popup {
   position: fixed;

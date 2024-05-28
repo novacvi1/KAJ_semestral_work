@@ -11,26 +11,60 @@ class Node {
     this.text = text;
     this.x = x;
     this.y = y;
-    this.width = 100;
     this.height = 40;
     this.rotation = 0;
     this.zIndex = 0;
+    this.maxWidth = 100;
   }
 
   render(ctx) {
+    // Make the node size dynamic based on the text
+    // Measure the width of the text
+    tempDiv.innerHTML = this.text;
+    tempDiv.style.display = 'inline';
+    tempDiv.style.display = 'none';
+
+    // Split the text into characters
+    const characters = this.text.split('');
+    const lines = [];
+    let currentLine = characters[0];
+
+    characters.forEach((character, i) => {
+      if (i > 0) {
+        const width = ctx.measureText(currentLine + character).width;
+        if (width < this.maxWidth) {
+          currentLine += character;
+        } else {
+          lines.push(currentLine);
+          currentLine = character;
+        }
+      }
+    });
+    lines.push(currentLine);
+
+    const lineHeight = parseFloat(computedStyles.lineHeight);
+    const paddingVertical = 14; // Define your padding
+    const paddingHorizontal = 10; // Define your padding
+
+    // Adjust the height of the node for each new line
+    this.height = ((lines.length) * (lineHeight)) + paddingVertical * 2; // Add padding to the height calculation
+
     ctx.save();
     ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
-    ctx.rotate(this.rotation * Math.PI / 180);
+    //ctx.rotate(this.rotation * Math.PI / 180);
     ctx.fillStyle = '#fff';
-    ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
     ctx.strokeStyle = '#000';
+    ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
     ctx.strokeRect(-this.width / 2, -this.height / 2, this.width, this.height);
     ctx.font = computedStyles.fontSize + ' ' + computedStyles.fontFamily;
     ctx.fillStyle = computedStyles.color;
     ctx.fillStyle = '#000';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(this.text, 0, 0);
+
+    // Draw each line separately
+    lines.forEach((line, i) => {
+      ctx.fillText(line, -this.width / 2 + paddingHorizontal, (-this.height) / 2 + paddingVertical * 2 + i * (lineHeight));
+    });
+
     ctx.restore();
   }
 
