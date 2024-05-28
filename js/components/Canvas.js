@@ -1,4 +1,5 @@
 import InputField from './InputField.js';
+import Storage from '../data/Storage.js';
 
 class Canvas {
   constructor(canvasId, mindmap) {
@@ -18,12 +19,17 @@ class Canvas {
     this.mindmap.nodes.forEach((node, index) => {
       node.zIndex = index;
     });
+    this.storage = new Storage();
 
     // Set the canvas's width and height attributes to match its display size
     this.resizeCanvas();
+    document.getElementById('save-map').addEventListener('click', () => this.saveCanvasState());
+    document.getElementById('load-map').addEventListener('click', () => this.loadCanvasState());
 
     // Add an event listener to resize the canvas whenever the window is resized
     window.addEventListener('resize', () => this.resizeCanvas());
+
+    document.getElementById('new-map').addEventListener('click', () => this.newMap());
   }
 
   initEvents() {
@@ -112,12 +118,20 @@ class Canvas {
   }
 
   onKeyDown(e) {
-    if ((e.key === 'Delete' || e.key === 'Backspace') && this.inputField.inputField !== document.activeElement) {
+    if ((e.key === 'Delete' || e.key === 'Backspace') && this.isHidden()) {
       if (this.selectedNode) {
         this.mindmap.removeNode(this.selectedNode);
         this.selectedNode = null;
         this.render();
       }
+    }
+  }
+
+  isHidden() {
+    try {
+      return this.inputField.inputField.hidden;
+    } catch (e) {
+      return true;
     }
   }
 
@@ -250,6 +264,13 @@ class Canvas {
     this.inputField.focus();
   }
 
+  newMap() {
+    this.mindmap.nodes = [];
+    this.mindmap.connectors = [];
+    localStorage.removeItem('canvasState');
+    this.render();
+  }
+
   render() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -274,6 +295,21 @@ class Canvas {
           this.ctx.fillRect(node.x, node.y, node.width, node.height);
         }
       });
+    }
+    this.saveCanvasState();
+  }
+
+  saveCanvasState() {
+    const mindmapData = this.mindmap.getData();
+    this.storage.saveData(mindmapData);
+  }
+
+  loadCanvasState() {
+    const loadedData = this.storage.loadData();
+    if (loadedData) {
+      this.mindmap.loadData(loadedData);
+      // Redraw the canvas based on the loaded state
+      this.render();
     }
   }
 

@@ -24,11 +24,9 @@ class Connector {
     };
   }
 
-  loadData(data) {
-    // eslint-disable-next-line
-    this.node1 = null;
-    // eslint-disable-next-line
-    this.node2 = null;
+  loadData(data, nodeMap) {
+    this.node1 = nodeMap[data.node1Id];
+    this.node2 = nodeMap[data.node2Id];
     this.color = data.color;
     this.width = data.width;
     return this;

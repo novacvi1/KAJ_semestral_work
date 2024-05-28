@@ -41,9 +41,18 @@ class MindMap {
   }
 
   loadData(data) {
+    // Load nodes
     this.nodes = data.nodes.map((nodeData) => new Node().loadData(nodeData));
+
+    // Create a map of node ids to node instances
+    const nodeMap = this.nodes.reduce((map, node) => {
+      map[node.id] = node;
+      return map;
+    }, {});
+
+    // Load connectors
     this.connectors = data.connectors.map(
-      (connectorData) => new Connector().loadData(connectorData)
+      (connectorData) => new Connector().loadData(connectorData, nodeMap)
     );
   }
 }
