@@ -10,9 +10,7 @@ class Canvas {
     this.selectedNode = null;
     this.startX = 0;
     this.startY = 0;
-    this.isConnectingNodes = false;
-    //this.nodeToConnect = null;
-    //this.editingNode = null;
+    this.connectingNodes = false;
     this.contextMenuVisible = false;
     this.contextMenuX = 0;
     this.contextMenuY = 0;
@@ -46,6 +44,9 @@ class Canvas {
 
   // Right-click on canvas
   onContextMenu(e) {
+    // Close opened context menu
+    this.onWindowClick(e);
+
     e.preventDefault();
 
     const x = e.offsetX;
@@ -112,7 +113,7 @@ class Canvas {
       this.inputField.focus();
       this.render();
     } else if (targetId === 'connect-nodes') {
-      this.isConnectingNodes = true;
+      this.connectingNodes = this.selectedNode;
     }
     this.hideContextMenu();
   }
@@ -167,27 +168,17 @@ class Canvas {
 
       console.log(clickedNodes.zIndex);
 
-      if (this.isConnectingNodes) {
-        if (this.selectedNode !== this.isConnectingNodes) {
-          this.mindmap.connectNodes(this.selectedNode, this.isConnectingNodes);
-          this.isConnectingNodes = false;
-          this.nodeToConnect = null;
+      if (this.connectingNodes) {
+        if (this.selectedNode !== this.connectingNodes) {
+          this.mindmap.connectNodes(this.selectedNode, this.connectingNodes);
+          this.connectingNodes = false;
+          this.selectedNode = null;
         }
-
-        // if (this.nodeToConnect) {
-        //   this.mindmap.connectNodes(this.nodeToConnect, clickedNodes[0]);
-        //   this.isConnectingNodes = false;
-        //   this.nodeToConnect = null;
-        //
-        // } else {
-        //   this.nodeToConnect = clickedNodes[0];
-        // }
       }
     } else {
       this.selectedNode = null;
-      if (this.isConnectingNodes) {
-        this.isConnectingNodes = false;
-        this.nodeToConnect = null;
+      if (this.connectingNodes) {
+        this.connectingNodes = false;
       }
     }
     this.render();

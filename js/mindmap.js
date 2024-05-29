@@ -10,6 +10,7 @@ class MindMap {
   addNode(text, x, y) {
     const node = new Node(text, x, y);
     this.nodes.push(node);
+    console.log(node)
     return node;
   }
 
@@ -48,6 +49,7 @@ class MindMap {
       map[node.id] = node;
       return map;
     }, {});
+    console.log(this.nodes)
 
     // Load connectors
     this.connectors = data.connectors.map(
