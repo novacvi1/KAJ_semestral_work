@@ -11,8 +11,8 @@ class Canvas {
     this.startX = 0;
     this.startY = 0;
     this.isConnectingNodes = false;
-    this.nodeToConnect = null;
-    this.editingNode = null;
+    //this.nodeToConnect = null;
+    //this.editingNode = null;
     this.contextMenuVisible = false;
     this.contextMenuX = 0;
     this.contextMenuY = 0;
@@ -168,14 +168,20 @@ class Canvas {
       console.log(clickedNodes.zIndex);
 
       if (this.isConnectingNodes) {
-        if (this.nodeToConnect) {
-          this.mindmap.connectNodes(this.nodeToConnect, clickedNodes[0]);
+        if (this.selectedNode !== this.isConnectingNodes) {
+          this.mindmap.connectNodes(this.selectedNode, this.isConnectingNodes);
           this.isConnectingNodes = false;
           this.nodeToConnect = null;
-
-        } else {
-          this.nodeToConnect = clickedNodes[0];
         }
+
+        // if (this.nodeToConnect) {
+        //   this.mindmap.connectNodes(this.nodeToConnect, clickedNodes[0]);
+        //   this.isConnectingNodes = false;
+        //   this.nodeToConnect = null;
+        //
+        // } else {
+        //   this.nodeToConnect = clickedNodes[0];
+        // }
       }
     } else {
       this.selectedNode = null;

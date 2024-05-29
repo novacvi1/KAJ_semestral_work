@@ -60,6 +60,7 @@ class Node {
     ctx.fillStyle = computedStyles.color;
     ctx.fillStyle = '#000';
 
+
     // Draw each line separately
     lines.forEach((line, i) => {
       ctx.fillText(line, -this.width / 2 + paddingHorizontal, (-this.height) / 2 + paddingVertical * 2 + i * (lineHeight));
