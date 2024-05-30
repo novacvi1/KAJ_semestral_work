@@ -21,13 +21,20 @@ class Canvas {
 
     // Set the canvas's width and height attributes to match its display size
     this.resizeCanvas();
-    document.getElementById('save-map').addEventListener('click', () => this.saveCanvasState());
-    document.getElementById('load-map').addEventListener('click', () => this.loadCanvasState());
+    document.getElementById('save-map').addEventListener('click', () =>
+      this.saveCanvasStateToFile());
+    document.getElementById('load-map').addEventListener('click', () => {
+      document.getElementById('file-input').click();
+    });
+    document.getElementById('file-input').addEventListener('change', (event) =>
+      this.loadCanvasState(event));
 
     // Add an event listener to resize the canvas whenever the window is resized
     window.addEventListener('resize', () => this.resizeCanvas());
 
     document.getElementById('new-map').addEventListener('click', () => this.newMap());
+
+
   }
 
   initEvents() {
@@ -116,6 +123,30 @@ class Canvas {
       this.connectingNodes = this.selectedNode;
     }
     this.hideContextMenu();
+  }
+
+  showErrorModal(message) {
+    const errorModal = document.getElementById('error-modal');
+    const errorMessage = document.getElementById('error-message');
+    const closeErrorButton = document.getElementById('close-error-button');
+
+    errorMessage.textContent = message;
+    errorModal.classList.add('show');
+
+    closeErrorButton.addEventListener('click', hideErrorModal);
+    window.addEventListener('click', outsideClickHandler);
+
+    function hideErrorModal() {
+      errorModal.classList.remove('show');
+      closeErrorButton.removeEventListener('click', hideErrorModal);
+      window.removeEventListener('click', outsideClickHandler);
+    }
+
+    function outsideClickHandler(event) {
+      if (event.target === errorModal) {
+        hideErrorModal();
+      }
+    }
   }
 
   onKeyDown(e) {
@@ -305,18 +336,48 @@ class Canvas {
     this.saveCanvasState();
   }
 
-  saveCanvasState() {
-    const mindmapData = this.mindmap.getData();
-    this.storage.saveData(mindmapData);
+  saveCanvasState(){
+    const mindMapData = this.mindmap.getData();
+    this.storage.saveData(mindMapData)
   }
 
-  loadCanvasState() {
-    const loadedData = this.storage.loadData();
-    if (loadedData) {
-      this.mindmap.loadData(loadedData);
-      // Redraw the canvas based on the loaded state
-      this.render();
+  saveCanvasStateToFile() {
+    const mindmapData = this.mindmap.getData();
+    const stateJson = JSON.stringify(mindmapData);
+    const blob = new Blob([stateJson], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = "canvas_data.json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  loadCanvasState(event) {
+    console.log("load")
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target.result;
+        try {
+          const json = JSON.parse(content);
+          this.mindmap.loadData(json);
+          this.render();
+        } catch (error) {
+          this.showErrorModal('Error parsing JSON, wrong file input! Use only files saved by this app.');
+        }
+      };
+      reader.readAsText(file);
     }
+    // Reset the file input value to allow the same file to be selected again
+    event.target.value = '';
+  }
+
+  loadCanvasStateFromFileDrop() {
+
   }
 
   // To change the size of the canvas when the window is resized
