@@ -48,3 +48,31 @@ window.addEventListener('load', () => {
   }, 1000);
 });
 
+// Select the network status popup
+const networkStatusPopup = document.getElementById('network-status-popup');
+
+// Function to show the network status popup
+function showNetworkStatusPopup(message) {
+  networkStatusPopup.textContent = message;
+  networkStatusPopup.style.display = 'block';
+  setTimeout(() => {
+    networkStatusPopup.style.display = 'none';
+  }, 2000);
+}
+
+// Add online and offline event listeners
+window.addEventListener('online', () => {
+  showNetworkStatusPopup('You are online');
+});
+
+window.addEventListener('offline', () => {
+  showNetworkStatusPopup('You are offline');
+});
+
+// Check the initial network status
+if (navigator.onLine) {
+  showNetworkStatusPopup('You are online');
+} else {
+  showNetworkStatusPopup('You are offline');
+}
+

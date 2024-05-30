@@ -131,17 +131,24 @@ header nav li:hover {
 
 /* Text node input */
 .node-input {
+  display: none;
+  position: absolute;
+  width: 200px;
   font-family: 'Poppins', sans-serif;
   font-size: 16px;
   color: #333;
   background-color: #f7f7f7;
   padding-inline: 5px;
-  max-width: 200px;
+  border: 5px solid #f7f7f7;
 }
 
 .node-text {
   word-wrap: break-word;
-  line-height: 1.2; /* Adjust as needed */
+  line-height: 1.2;
+}
+
+.node-input:invalid {
+  border-color: red;
 }
 
 #file-input {
@@ -277,10 +284,29 @@ line {
 }
 
 #drop-area {
+  display: none;
   position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
   z-index: 9999;
+}
+
+#network-status-popup {
+  display: none;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: white;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.8s ease;
+}
+
+#input-error {
+  color: red;
 }

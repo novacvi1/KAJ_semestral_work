@@ -1,19 +1,27 @@
 export default class InputField {
   constructor(parentNode, canvas, onEnter, onBlur) {
-    this.inputField = document.createElement('input');
-    this.inputField.type = 'text';
-    this.inputField.className = 'node-input';
-    this.inputField.style.position = 'absolute';
-    this.inputField.style.width = '200px';
+    this.inputField = document.querySelector('.node-input');
     this.inputField.addEventListener('keydown', onEnter);
     this.inputField.addEventListener('blur', onBlur);
     parentNode.appendChild(this.inputField);
     this.canvas = canvas;
+
+    // Position inputField
+    this.positionInputField();
+
+    // Add event listener for window resize
+    window.addEventListener('resize', () => this.positionInputField());
+  }
+
+  positionInputField() {
+    let computedStyle = window.getComputedStyle(this.inputField);
+    let width = computedStyle.width;
+    let widthValue = parseInt(width, 10); // Remove "px" and convert to number
+
     // Position inputField in the center of the screen horizontally
+    this.inputField.style.left = `${(window.innerWidth - widthValue) / 2}px`;
 
-    this.inputField.style.left = `${window.innerWidth - this.inputField.style.width / 2}px`;
     // Position inputField in the upper part of the canvas
-
     this.inputField.style.top = `${this.canvas.offsetTop + this.canvas.offsetHeight * 0.03}px`;
   }
 
@@ -27,9 +35,5 @@ export default class InputField {
 
   getValue() {
     return this.inputField.value;
-  }
-
-  remove() {
-    this.inputField.remove();
   }
 }

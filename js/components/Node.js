@@ -15,7 +15,7 @@ class Node {
     this.rotation = 0;
     this.zIndex = 0;
     this.maxWidth = 100;
-    this.width = 100;
+    this.width = 200;
   }
 
   render(ctx) {

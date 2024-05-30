@@ -2,6 +2,9 @@ import InputField from './InputField.js';
 import Storage from '../data/Storage.js';
 
 const dropZone = document.querySelector('.drag-zone');
+// Select the input field and the error message div
+const nodeInput = document.querySelector('.node-input');
+const inputError = document.getElementById('input-error');
 
 
 class Canvas {
@@ -21,6 +24,7 @@ class Canvas {
       node.zIndex = index;
     });
     this.storage = new Storage();
+    this.inputField = new InputField(document.body, this.canvas, this.onInputFieldEnterOrEscape.bind(this), this.onInputFieldBlur.bind(this));
     // Set the canvas's width and height attributes to match its display size
     this.resizeCanvas();
 
@@ -54,6 +58,25 @@ class Canvas {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         this.loadCanvasStateFromFileDrop(file); // Function to handle the file
+      }
+    });
+
+    nodeInput.addEventListener('input', (event) => {
+      // Get the input value
+      const inputValue = nodeInput.value
+      //TODO fix text show up
+
+      // Check if the input is empty or exceeds the maximum length
+      if (inputValue.trim() === '' || inputValue.length > 100) {
+        // Show the error message
+        inputError.textContent = 'Invalid input';
+        inputError.style.display = 'block';
+        // Change the border color of the input field
+        nodeInput.style.borderColor = 'red';
+      } else {
+        // If the input is valid, hide the error message and reset the border color
+        inputError.style.display = 'none';
+        nodeInput.style.borderColor = '';
       }
     });
 
@@ -146,7 +169,7 @@ class Canvas {
       let canvasOffset = this.canvas.getBoundingClientRect();
       this.selectedNode = this.mindmap.addNode('New Node', this.contextMenuX - canvasOffset.x,
         this.contextMenuY - canvasOffset.y);
-      this.createInputField();
+      this.showInputField();
       this.inputField.setValue(this.selectedNode.text);
       this.inputField.focus();
       this.render();
@@ -162,7 +185,7 @@ class Canvas {
       this.selectedNode = null;
       this.render();
     } else if (targetId === 'edit-node' && this.selectedNode) {
-      this.createInputField();
+      this.showInputField();
       this.inputField.setValue(this.selectedNode.text);
       this.inputField.focus();
       this.render();
@@ -271,7 +294,7 @@ class Canvas {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    this.createInputField();
+    this.showInputField();
 
     const clickedNode = this.mindmap.nodes.find(node => this.isPointInNode(x, y, node));
     if (clickedNode) {
@@ -309,42 +332,56 @@ class Canvas {
 
   onInputFieldEnterOrEscape(e) {
     if (e.key === 'Enter') {
-      this.selectedNode.text = this.inputField.getValue();
-      try {
-        this.inputField.remove();
-      } catch (e) {
+      if (this.inputField.getValue().length > 100 || this.inputField.getValue().trim() === '') {
+        // Show an error message
+        console.log('Invalid input');
+        // You can also add a visual indication for the error, like changing the border color of the input field
+        //this.inputField.inputField.style.borderColor = 'red';
+      } else {
+        // If the input is valid, reset the border color
+        this.inputField.inputField.style.borderColor = '';
+        this.selectedNode.text = this.inputField.getValue();
+        try {
+          this.inputField.inputField.style.display = 'none';
+        } catch (e) {
+        }
+        this.render();
       }
-      this.render();
     }
     if (e.key === 'Escape') {
       this.onInputFieldBlur()
     }
 
     // Remove the input event listener when the input field is removed
-    this.inputField.inputField.removeEventListener('input', this.inputField.inputField.oninput);
+    //this.inputField.inputField.removeEventListener('input', this.inputField.inputField.oninput);
   }
 
   onInputFieldBlur() {
     try {
-      this.inputField.remove();
+      this.inputField.inputField.style.display = 'none';
     } catch (e) {
     }
   }
 
-  createInputField() {
-    this.inputField = new InputField(
-      this.canvas.parentNode,
-      this.canvas,
-      this.onInputFieldEnterOrEscape.bind(this),
-      this.onInputFieldBlur.bind(this)
-    );
+  showInputField() {
+    this.inputField.inputField.style.display = 'block';
 
     this.inputField.focus();
 
     // Add an input event listener to resize the node when the input field's value changes
     this.inputField.inputField.addEventListener('input', () => {
-      this.selectedNode.text = this.inputField.getValue();
-      this.render();
+      // Check if the input is empty or exceeds the maximum length
+      if (this.inputField.getValue().length > 100 || this.inputField.getValue().trim() === '') {
+        // Show an error message
+        console.log('Invalid input');
+        // You can also add a visual indication for the error, like changing the border color of the input field
+        //this.inputField.inputField.style.borderColor = 'red';
+      } else {
+        // If the input is valid, reset the border color
+        this.inputField.inputField.style.borderColor = '';
+        this.selectedNode.text = this.inputField.getValue();
+        this.render();
+      }
     });
   }
 
