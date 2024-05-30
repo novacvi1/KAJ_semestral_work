@@ -69,6 +69,8 @@ main {
 }
 
 #context-menu, #context-menu-on-node {
+  display: none;
+  position: absolute;
   background-color: #fff;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
@@ -259,4 +261,26 @@ line {
 
 .hidden-label {
   display: none;
+}
+
+#canvas-placeholder-on-drag {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  text-align: center;
+  border-radius: 5px;
+}
+
+#drop-area {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 9999;
 }

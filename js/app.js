@@ -47,3 +47,4 @@ window.addEventListener('load', () => {
     loadingScreen.classList.add('hide');
   }, 1000);
 });
+

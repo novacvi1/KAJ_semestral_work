@@ -1,6 +1,9 @@
 import InputField from './InputField.js';
 import Storage from '../data/Storage.js';
 
+const dropZone = document.querySelector('.drag-zone');
+
+
 class Canvas {
   constructor(canvasId, mindmap) {
     this.mindmap = mindmap;
@@ -18,9 +21,42 @@ class Canvas {
       node.zIndex = index;
     });
     this.storage = new Storage();
-
     // Set the canvas's width and height attributes to match its display size
     this.resizeCanvas();
+
+    const dropArea = document.getElementById('drop-area');
+
+    dropZone.addEventListener('dragenter', (event) => {
+      dropArea.style.display = 'block';
+      event.preventDefault();
+      console.log('dragover');
+      this.showPlaceholder(event);
+    });
+
+    dropArea.addEventListener('dragover', (event) => {
+      event.preventDefault(); // This line is important
+      console.log('dragover');
+    });
+
+    dropArea.addEventListener('dragleave', () => {
+      console.log('dragleave');
+      dropArea.style.display = 'none';
+      this.hidePlaceholder();
+    });
+
+    dropArea.addEventListener('drop', (event) => {
+      event.preventDefault();
+      console.log('drop');
+      this.hidePlaceholder();
+      dropArea.style.display = 'none';
+      const files = event.dataTransfer.files; // The files that were dropped
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        this.loadCanvasStateFromFileDrop(file); // Function to handle the file
+      }
+    });
+
     document.getElementById('save-map').addEventListener('click', () =>
       this.saveCanvasStateToFile());
     document.getElementById('load-map').addEventListener('click', () => {
@@ -33,7 +69,6 @@ class Canvas {
     window.addEventListener('resize', () => this.resizeCanvas());
 
     document.getElementById('new-map').addEventListener('click', () => this.newMap());
-
 
   }
 
@@ -70,6 +105,18 @@ class Canvas {
     this.contextMenuY = e.clientY;
     this.showContextMenu();
     this.render();
+  }
+
+  // Show the placeholder
+  showPlaceholder(event) {
+    document.getElementById('canvas-placeholder-on-drag').style.display = 'block';
+    console.log('show', event);
+  }
+
+  // Hide the placeholder
+  hidePlaceholder(event) {
+    document.getElementById('canvas-placeholder-on-drag').style.display = 'none';
+    console.log('hide', event);
   }
 
   showContextMenu() {
@@ -143,7 +190,7 @@ class Canvas {
     }
 
     function outsideClickHandler(event) {
-      if (event.target === errorModal) {
+      if (!errorModal.contains(event.target)) {
         hideErrorModal();
       }
     }
@@ -376,8 +423,21 @@ class Canvas {
     event.target.value = '';
   }
 
-  loadCanvasStateFromFileDrop() {
+  loadCanvasStateFromFileDrop(file) {
+    const reader = new FileReader();
 
+    reader.onload = (event) => {
+      const content = event.target.result;
+      console.log(content); // Do something with the file's content
+      try {
+        const json = JSON.parse(content);
+        this.mindmap.loadData(json);
+        this.render();
+      } catch (error) {
+        this.showErrorModal('Error parsing JSON, wrong file input! Use only files saved by this app.');
+      }
+    };
+    reader.readAsText(file); // Read the file as text
   }
 
   // To change the size of the canvas when the window is resized
