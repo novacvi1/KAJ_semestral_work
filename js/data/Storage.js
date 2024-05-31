@@ -1,8 +1,7 @@
 class Storage {
-  saveData(state) {
+  static saveData(state) {
     const stateJson = JSON.stringify(state);
     localStorage.setItem('canvasState', stateJson);
-    //localStorage.setItem('mindmap', JSON.stringify(data))
     console.log('saveData', state);
   }
 

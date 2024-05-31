@@ -1,11 +1,10 @@
 import InputField from './InputField.js';
-import Storage from '../data/Storage.js';
 
 const dropZone = document.querySelector('.drag-zone');
 // Select the input field and the error message div
 const nodeInput = document.querySelector('.node-input');
 const inputError = document.getElementById('input-error');
-// Create an Audio object
+
 
 class Canvas {
   constructor(canvasId, mindmap) {
@@ -23,7 +22,6 @@ class Canvas {
     this.mindmap.nodes.forEach((node, index) => {
       node.zIndex = index;
     });
-    this.storage = new Storage();
     this.inputField = new InputField(this.canvas, this.onInputFieldEnterOrEscape.bind(this), this.onInputFieldBlur.bind(this));
     // Set the canvas's width and height attributes to match its display size
     this.resizeCanvas();
@@ -33,24 +31,20 @@ class Canvas {
     dropZone.addEventListener('dragenter', (event) => {
       dropArea.style.display = 'block';
       event.preventDefault();
-      console.log('dragover');
-      this.showPlaceholder(event);
+      this.showPlaceholder();
     });
 
     dropArea.addEventListener('dragover', (event) => {
       event.preventDefault(); // This line is important
-      console.log('dragover');
     });
 
     dropArea.addEventListener('dragleave', () => {
-      console.log('dragleave');
       dropArea.style.display = 'none';
       this.hidePlaceholder();
     });
 
     dropArea.addEventListener('drop', (event) => {
       event.preventDefault();
-      console.log('drop');
       this.hidePlaceholder();
       dropArea.style.display = 'none';
       const files = event.dataTransfer.files; // The files that were dropped
@@ -61,7 +55,7 @@ class Canvas {
       }
     });
 
-    nodeInput.addEventListener('input', (event) => {
+    nodeInput.addEventListener('input', () => {
       const inputValue = nodeInput.value
 
       // Check if the input is empty or exceeds the maximum length
@@ -78,7 +72,7 @@ class Canvas {
     });
 
     document.getElementById('save-map').addEventListener('click', () =>
-      this.saveCanvasStateToFile());
+      this.mindmap.saveCanvasStateToFile());
     document.getElementById('load-map').addEventListener('click', () => {
       document.getElementById('file-input').click();
     });
@@ -90,6 +84,14 @@ class Canvas {
 
     document.getElementById('new-map').addEventListener('click', () => this.newMap());
 
+    // History state
+    window.addEventListener('popstate', (event) => {
+      if (event.state) {
+        //this.newMap()
+        this.mindmap.loadData(event.state);
+        this.render();
+      }
+    });
   }
 
   initEvents() {
@@ -128,15 +130,13 @@ class Canvas {
   }
 
   // Show the placeholder
-  showPlaceholder(event) {
+  showPlaceholder() {
     document.getElementById('canvas-placeholder-on-drag').style.display = 'block';
-    console.log('show', event);
   }
 
   // Hide the placeholder
-  hidePlaceholder(event) {
+  hidePlaceholder() {
     document.getElementById('canvas-placeholder-on-drag').style.display = 'none';
-    console.log('hide', event);
   }
 
   showContextMenu() {
@@ -148,7 +148,6 @@ class Canvas {
     contextMenu.style.left = `${this.contextMenuX}px`;
     contextMenu.style.top = `${this.contextMenuY}px`;
     this.contextMenuVisible = true;
-    console.log('Context Menu:', this.contextMenuX, this.contextMenuY);
   }
 
   hideContextMenu() {
@@ -329,28 +328,17 @@ class Canvas {
 
   onInputFieldEnterOrEscape(e) {
     if (e.key === 'Enter') {
-      if (this.inputField.getValue().length > 100 || this.inputField.getValue().trim() === '') {
-        // Show an error message
-        console.log('Invalid input');
-        // You can also add a visual indication for the error, like changing the border color of the input field
-        //this.inputField.inputField.style.borderColor = 'red';
-      } else {
-        // If the input is valid, reset the border color
-        this.inputField.inputField.style.borderColor = '';
+      if (this.inputField.getValue().length <= 100 && this.inputField.getValue().trim() !== '') {
         this.selectedNode.text = this.inputField.getValue();
         try {
           this.inputField.inputField.style.display = 'none';
-        } catch (e) {
-        }
+        } catch (e) {}
         this.render();
       }
     }
     if (e.key === 'Escape') {
       this.onInputFieldBlur()
     }
-
-    // Remove the input event listener when the input field is removed
-    //this.inputField.inputField.removeEventListener('input', this.inputField.inputField.oninput);
   }
 
   onInputFieldBlur() {
@@ -369,14 +357,7 @@ class Canvas {
     // Add an input event listener to resize the node when the input field's value changes
     this.inputField.inputField.addEventListener('input', () => {
       // Check if the input is empty or exceeds the maximum length
-      if (this.inputField.getValue().length > 100 || this.inputField.getValue().trim() === '') {
-        // Show an error message
-        console.log('Invalid input');
-        // You can also add a visual indication for the error, like changing the border color of the input field
-        //this.inputField.inputField.style.borderColor = 'red';
-      } else {
-        // If the input is valid, reset the border color
-        this.inputField.inputField.style.borderColor = '';
+      if (this.inputField.getValue().length <= 100 && this.inputField.getValue().trim() !== '') {
         this.selectedNode.text = this.inputField.getValue();
         this.render();
       }
@@ -415,30 +396,10 @@ class Canvas {
         }
       });
     }
-    this.saveCanvasState();
-  }
-
-  saveCanvasState(){
-    const mindMapData = this.mindmap.getData();
-    this.storage.saveData(mindMapData)
-  }
-
-  saveCanvasStateToFile() {
-    const mindmapData = this.mindmap.getData();
-    const stateJson = JSON.stringify(mindmapData);
-    const blob = new Blob([stateJson], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = "canvas_data.json";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    //this.mindmap.saveCanvasState();
   }
 
   loadCanvasState(event) {
-    console.log("load")
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
@@ -446,7 +407,7 @@ class Canvas {
         const content = e.target.result;
         try {
           const json = JSON.parse(content);
-          this.mindmap.loadData(json);
+          this.mindmap.loadDataFromLocalStorage(json);
           this.render();
         } catch (error) {
           this.showErrorModal('Error parsing JSON, wrong file input! Use only files saved by this app.');
@@ -463,10 +424,9 @@ class Canvas {
 
     reader.onload = (event) => {
       const content = event.target.result;
-      console.log(content); // Do something with the file's content
       try {
         const json = JSON.parse(content);
-        this.mindmap.loadData(json);
+        this.mindmap.loadDataFromLocalStorage(json);
         this.render();
       } catch (error) {
         this.showErrorModal('Error parsing JSON, wrong file input! Use only files saved by this app.');

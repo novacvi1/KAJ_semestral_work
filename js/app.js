@@ -9,7 +9,7 @@ const storage = new Storage()
 // Localstorage
 const savedData = storage.loadData()
 if(savedData) {
-  mindmap.loadData(savedData)
+  mindmap.loadDataFromLocalStorage(savedData)
 }
 
 const canvas = new Canvas('mindmap-canvas', mindmap)

@@ -54,7 +54,6 @@ class Node {
 
     ctx.save();
     ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
-    //ctx.rotate(this.rotation * Math.PI / 180);
     ctx.fillStyle = '#fff';
     ctx.strokeStyle = '#000';
     ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
@@ -78,10 +77,6 @@ class Node {
     this.y = y;
   }
 
-  rotate(angle) {
-    this.rotation = angle;
-  }
-
   getData() {
     return {
       id: this.id,
@@ -103,20 +98,6 @@ class Node {
     this.height = data.height;
     this.rotation = data.rotation;
     return this;
-  }
-
-  renderConnections(ctx, connectors) {
-    connectors.forEach(connector => {
-      if (connector.node1 === this || connector.node2 === this) {
-        ctx.beginPath();
-        ctx.moveTo(this.x + this.width / 2, this.y + this.height / 2);
-        const otherNode = connector.node1 === this ? connector.node2 : connector.node1;
-        ctx.lineTo(otherNode.x + otherNode.width / 2, otherNode.y + otherNode.height / 2);
-        ctx.strokeStyle = connector.color;
-        ctx.lineWidth = connector.width;
-        ctx.stroke();
-      }
-    });
   }
 }
 
