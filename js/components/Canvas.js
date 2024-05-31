@@ -5,7 +5,7 @@ const dropZone = document.querySelector('.drag-zone');
 // Select the input field and the error message div
 const nodeInput = document.querySelector('.node-input');
 const inputError = document.getElementById('input-error');
-
+// Create an Audio object
 
 class Canvas {
   constructor(canvasId, mindmap) {
@@ -24,7 +24,7 @@ class Canvas {
       node.zIndex = index;
     });
     this.storage = new Storage();
-    this.inputField = new InputField(document.body, this.canvas, this.onInputFieldEnterOrEscape.bind(this), this.onInputFieldBlur.bind(this));
+    this.inputField = new InputField(this.canvas, this.onInputFieldEnterOrEscape.bind(this), this.onInputFieldBlur.bind(this));
     // Set the canvas's width and height attributes to match its display size
     this.resizeCanvas();
 
@@ -62,21 +62,18 @@ class Canvas {
     });
 
     nodeInput.addEventListener('input', (event) => {
-      // Get the input value
       const inputValue = nodeInput.value
-      //TODO fix text show up
 
       // Check if the input is empty or exceeds the maximum length
-      if (inputValue.trim() === '' || inputValue.length > 100) {
-        // Show the error message
-        inputError.textContent = 'Invalid input';
+      if (inputValue.trim() === '') {
+        inputError.textContent = 'Input cannot be empty';
         inputError.style.display = 'block';
-        // Change the border color of the input field
-        nodeInput.style.borderColor = 'red';
+      } else if (inputValue.length > 100) {
+        inputError.textContent = 'Input exceeds the maximum length of 100 characters';
+        inputError.style.display = 'block';
       } else {
         // If the input is valid, hide the error message and reset the border color
         inputError.style.display = 'none';
-        nodeInput.style.borderColor = '';
       }
     });
 
@@ -359,6 +356,7 @@ class Canvas {
   onInputFieldBlur() {
     try {
       this.inputField.inputField.style.display = 'none';
+      document.querySelector('#input-error').style.display = 'none';
     } catch (e) {
     }
   }

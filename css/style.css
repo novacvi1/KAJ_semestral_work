@@ -130,9 +130,13 @@ header nav li:hover {
 }
 
 /* Text node input */
+#input-container {
+  position: absolute;
+}
+
 .node-input {
   display: none;
-  position: absolute;
+  position: relative;
   width: 200px;
   font-family: 'Poppins', sans-serif;
   font-size: 16px;
@@ -151,8 +155,21 @@ header nav li:hover {
   border-color: red;
 }
 
+#input-error {
+  display: none;
+  position: relative;
+  color: red;
+  left: 5px;
+}
+
 #file-input {
   display: none;
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  color: #333;
+  background-color: #f7f7f7;
+  padding-inline: 5px;
+  border: 5px solid #f7f7f7;
 }
 
 #info-popup {
@@ -307,6 +324,3 @@ line {
   transition: opacity 0.8s ease;
 }
 
-#input-error {
-  color: red;
-}

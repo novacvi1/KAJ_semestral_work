@@ -1,6 +1,9 @@
 import Node from './components/node.js';
 import Connector from './components/connector.js';
 
+const destroySound = new Audio('./node_destruction_sound.mp3');
+
+
 class MindMap {
   constructor() {
     this.nodes = [];
@@ -20,6 +23,13 @@ class MindMap {
       this.nodes.splice(index, 1);
       this.removeConnectors(node);
     }
+    destroySound.play().catch(error => console.log('Audio play failed due to', error));
+
+    // Stop the sound after 1 second
+    setTimeout(() => {
+      destroySound.pause();
+      destroySound.currentTime = 0; // Reset the audio to the start
+    }, 1000);
   }
 
   removeConnectors(node) {
