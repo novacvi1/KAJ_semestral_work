@@ -217,6 +217,10 @@ header nav li:hover {
   pointer-events: auto;
 }
 
+#info-mobile-content {
+  display: none;
+}
+
 .pulse {
   -webkit-animation: pulse-animation 2s infinite;
   -moz-animation: pulse-animation 2s infinite;
@@ -406,20 +410,12 @@ h1 {
 
 /* Media queries to show/hide hamburger menu and drawer */
 @media only screen and (max-width: 600px) {
-  .hamburger {
+  #info-button, #mobile-toolbar, #info-mobile-content, .hamburger {
     display: block;
   }
 
-  #info-button {
-    display: block;
-  }
-
-  #nav-menu {
+  #nav-menu, #info-desktop-content {
     display: none;
-  }
-
-  #mobile-toolbar {
-    display: block;
   }
 }
 

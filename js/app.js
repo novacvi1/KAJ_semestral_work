@@ -1,140 +1,151 @@
-import MindMap from './mindmap.js'
-import Storage from './data/storage.js'
-import Canvas from './components/Canvas.js'
-import ToolBar from './components/ToolBar.js'
+// app.js
 
-const mindmap = new MindMap()
-const storage = new Storage()
+import MindMap from './mindmap.js';
+import Storage from './data/storage.js';
+import Canvas from './components/Canvas.js';
 
-// Localstorage
-const savedData = storage.loadData()
-if(savedData) {
-  mindmap.loadDataFromLocalStorage(savedData)
-}
+const App = {
+  init() {
+    this.mindmap = new MindMap();
+    this.storage = new Storage();
+    this.canvas = new Canvas('mindmap-canvas', this.mindmap);
+    this.initLocalStorage();
+    this.initCanvasEvents();
+    this.initPopups();
+    this.initLoadingScreen();
+    this.initNetworkStatus();
+    this.initHamburgerMenu();
+    this.initNodeActions();
+  },
 
-const canvas = new Canvas('mindmap-canvas', mindmap)
-const toolBar = new ToolBar(mindmap, canvas)
+  initLocalStorage() {
+    const savedData = this.storage.loadData();
+    if (savedData) {
+      this.mindmap.loadDataFromLocalStorage(savedData);
+    }
+  },
 
-canvas.initEvents()
-toolBar.initEvents()
+  initCanvasEvents() {
+    this.canvas.initEvents();
+  },
 
-// Pop-up info
-const infoPopup = document.getElementById('info-popup');
-document.addEventListener('DOMContentLoaded', () => {
-  const showInfoButton = document.querySelectorAll('.info-button');
+  initPopups() {
+    const infoPopup = document.getElementById('info-popup');
+    document.addEventListener('DOMContentLoaded', () => {
+      const showInfoButton = document.querySelectorAll('.info-button');
+      showInfoButton.forEach((button) => {
+        button.addEventListener('click', () => {
+          infoPopup.classList.add('show');
+        });
+      });
 
-  showInfoButton.forEach((button) => {
-    button.addEventListener('click', () => {
-      infoPopup.classList.add('show');
+      const closeButton = document.getElementById('close-popup');
+      closeButton.addEventListener('click', () => {
+        infoPopup.classList.remove('show');
+      });
+
+      document.addEventListener('click', (event) => {
+        if (!infoPopup.contains(event.target) && !Array.from(showInfoButton).some(button => button === event.target)) {
+          infoPopup.classList.remove('show');
+        }
+      });
     });
-  });
+  },
 
-  // Hide the pop-up
-  const closeButton = document.getElementById('close-popup');
+  initLoadingScreen() {
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const loadingScreen = document.getElementById('loading-screen');
+        loadingScreen.classList.add('hide');
+      }, 1000);
+    });
+  },
 
-  closeButton.addEventListener('click', () => {
-    infoPopup.classList.remove('show');
-  });
+  initNetworkStatus() {
+    const networkStatusPopup = document.getElementById('network-status-popup');
 
-  document.addEventListener('click', (event) => {
-    // Check if the click was outside the pop-up
-    if (!infoPopup.contains(event.target) && !Array.from(showInfoButton).some(button => button === event.target)) {
-      infoPopup.classList.remove('show');
+    function showNetworkStatusPopup(message) {
+      networkStatusPopup.textContent = message;
+      networkStatusPopup.style.display = 'block';
+      setTimeout(() => {
+        networkStatusPopup.style.display = 'none';
+      }, 2000);
     }
-  });
-});
 
-// Loading screen
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    const loadingScreen = document.getElementById('loading-screen');
-    loadingScreen.classList.add('hide');
-  }, 1000);
-});
+    window.addEventListener('online', () => {
+      showNetworkStatusPopup('You are online');
+    });
 
-// Select the network status popup
-const networkStatusPopup = document.getElementById('network-status-popup');
+    window.addEventListener('offline', () => {
+      showNetworkStatusPopup('You are offline');
+    });
 
-// Function to show the network status popup
-function showNetworkStatusPopup(message) {
-  networkStatusPopup.textContent = message;
-  networkStatusPopup.style.display = 'block';
-  setTimeout(() => {
-    networkStatusPopup.style.display = 'none';
-  }, 2000);
-}
+    if (navigator.onLine) {
+      showNetworkStatusPopup('You are online');
+    } else {
+      showNetworkStatusPopup('You are offline');
+    }
+  },
 
-// Add online and offline event listeners
-window.addEventListener('online', () => {
-  showNetworkStatusPopup('You are online');
-});
+  initHamburgerMenu() {
+    document.addEventListener('DOMContentLoaded', () => {
+      const hamburger = document.getElementById('hamburger-button');
+      const drawer = document.getElementById('drawer');
+      const backButton = document.getElementById('back-button');
 
-window.addEventListener('offline', () => {
-  showNetworkStatusPopup('You are offline');
-});
+      hamburger.addEventListener('click', () => {
+        drawer.classList.toggle('open');
+      });
 
-// Check the initial network status
-if (navigator.onLine) {
-  showNetworkStatusPopup('You are online');
-} else {
-  showNetworkStatusPopup('You are offline');
-}
+      backButton.addEventListener('click', () => {
+        drawer.classList.remove('open');
+      });
+
+      document.addEventListener('click', (event) => {
+        if (!drawer.contains(event.target) && event.target !== hamburger) {
+          drawer.classList.remove('open');
+        }
+      });
+    });
+  },
+
+  initNodeActions() {
+    document.addEventListener('DOMContentLoaded', () => {
+      const createNodeButton = document.getElementById('create-node-button');
+      const deleteNodeButton = document.getElementById('delete-node-button');
+      const editNodeButton = document.getElementById('edit-node-button');
+      const connectNodesButton = document.getElementById('connect-nodes-button');
+
+      createNodeButton.addEventListener('click', () => {
+        this.canvas.onAddNodeClick();
+      });
+
+      deleteNodeButton.addEventListener('click', () => {
+        if (this.canvas.selectedNode) {
+          this.mindmap.removeNode(this.canvas.selectedNode);
+          this.canvas.selectedNode = null;
+          this.canvas.render();
+        }
+      });
+
+      editNodeButton.addEventListener('click', () => {
+        if (this.canvas.selectedNode) {
+          this.canvas.showInputField();
+          this.canvas.inputField.setValue(this.canvas.selectedNode.text);
+          this.canvas.inputField.focus();
+          this.canvas.render();
+        }
+      });
+
+      connectNodesButton.addEventListener('click', () => {
+        if (this.canvas.selectedNode) {
+          this.canvas.connectingNodes = this.canvas.selectedNode;
+        }
+      });
+    });
+  }
+};
 
 document.addEventListener('DOMContentLoaded', () => {
-  const hamburger = document.getElementById('hamburger-button');
-  const drawer = document.getElementById('drawer');
-  const backButton = document.getElementById('back-button');
-
-  hamburger.addEventListener('click', () => {
-    drawer.classList.toggle('open');
-  });
-
-  backButton.addEventListener('click', () => {
-    drawer.classList.remove('open');
-  });
-
-  document.getElementById('create-node-button').addEventListener('click', () => {
-    console.log('Create node clicked');
-    toolBar.onAddNodeClick();
-  });
-
-  document.addEventListener('click', (event) => {
-    if (!drawer.contains(event.target) && event.target !== hamburger) {
-      drawer.classList.remove('open');
-    }
-  });
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-  const createNodeButton = document.getElementById('create-node-button');
-  const deleteNodeButton = document.getElementById('delete-node-button');
-  const editNodeButton = document.getElementById('edit-node-button');
-  const connectNodesButton = document.getElementById('connect-nodes-button');
-
-  createNodeButton.addEventListener('click', () => {
-    toolBar.onAddNodeClick();
-  });
-
-  deleteNodeButton.addEventListener('click', () => {
-    if (canvas.selectedNode) {
-      mindmap.removeNode(canvas.selectedNode);
-      canvas.selectedNode = null;
-      canvas.render();
-    }
-  });
-
-  editNodeButton.addEventListener('click', () => {
-    if (canvas.selectedNode) {
-      canvas.showInputField();
-      canvas.inputField.setValue(canvas.selectedNode.text);
-      canvas.inputField.focus();
-      canvas.render();
-    }
-  });
-
-  connectNodesButton.addEventListener('click', () => {
-    if (canvas.selectedNode) {
-      canvas.connectingNodes = canvas.selectedNode;
-    }
-  });
+  App.init();
 });

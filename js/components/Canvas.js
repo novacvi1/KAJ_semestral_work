@@ -380,6 +380,11 @@ class Canvas {
     this.render();
   }
 
+  onAddNodeClick() {
+    this.mindmap.addNode('New Node', 100, 100);
+    this.render();
+  }
+
   render() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -405,7 +410,7 @@ class Canvas {
         }
       });
     }
-    //this.mindmap.saveCanvasState();
+    this.mindmap.saveCanvasStateToLocalStorage();
   }
 
   loadCanvasState(event) {

@@ -19,11 +19,6 @@ export default class InputField {
 
     document.querySelector('#input-container').style.left = `${(window.innerWidth - widthValue) / 2}px`;
     document.querySelector('#input-container').style.top = `${this.canvas.offsetTop + this.canvas.offsetHeight * 0.03}px`;
-    // Position inputField in the center of the screen horizontally
-    //this.inputField.style.left = `${(window.innerWidth - widthValue) / 2}px`;
-
-    // Position inputField in the upper part of the canvas
-    //this.inputField.style.top = `${this.canvas.offsetTop + this.canvas.offsetHeight * 0.03}px`;
   }
 
   focus() {
