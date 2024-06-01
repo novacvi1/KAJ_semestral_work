@@ -1,10 +1,7 @@
 import InputField from './InputField.js';
-
-const dropZone = document.querySelector('.drag-zone');
-// Select the input field and the error message div
-const nodeInput = document.querySelector('.node-input');
-const inputError = document.getElementById('input-error');
-
+import DropZone from './DropZone.js';
+import ContextMenu from './ContextMenu.js';
+import NodeInput from './NodeInput.js';
 
 class Canvas {
   constructor(canvasId, mindmap) {
@@ -16,86 +13,16 @@ class Canvas {
     this.startX = 0;
     this.startY = 0;
     this.connectingNodes = false;
-    this.contextMenuVisible = false;
-    this.contextMenuX = 0;
-    this.contextMenuY = 0;
-    this.mindmap.nodes.forEach((node, index) => {
-      node.zIndex = index;
-    });
+
+    this.contextMenu = new ContextMenu(this);
     this.inputField = new InputField(this.canvas, this.onInputFieldEnterOrEscape.bind(this), this.onInputFieldBlur.bind(this));
-    // Set the canvas's width and height attributes to match its display size
+    this.nodeInput = new NodeInput('.node-input', 'input-error', this);
+    new DropZone('.drag-zone', '#drop-area', this);
+
+    this.initEvents();
     this.resizeCanvas();
-
-    const dropArea = document.getElementById('drop-area');
-
-    dropZone.addEventListener('dragenter', (event) => {
-      dropArea.style.display = 'block';
-      event.preventDefault();
-      this.showPlaceholder();
-    });
-
-    dropArea.addEventListener('dragover', (event) => {
-      event.preventDefault(); // This line is important
-    });
-
-    dropArea.addEventListener('dragleave', () => {
-      dropArea.style.display = 'none';
-      this.hidePlaceholder();
-    });
-
-    dropArea.addEventListener('drop', (event) => {
-      event.preventDefault();
-      this.hidePlaceholder();
-      dropArea.style.display = 'none';
-      const files = event.dataTransfer.files; // The files that were dropped
-
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        this.loadCanvasStateFromFileDrop(file); // Function to handle the file
-      }
-    });
-
-    nodeInput.addEventListener('input', () => {
-      const inputValue = nodeInput.value
-
-      // Check if the input is empty or exceeds the maximum length
-      if (inputValue.trim() === '') {
-        inputError.textContent = 'Input cannot be empty';
-        inputError.style.display = 'block';
-      } else if (inputValue.length > 100) {
-        inputError.textContent = 'Input exceeds the maximum length of 100 characters';
-        inputError.style.display = 'block';
-      } else {
-        // If the input is valid, hide the error message and reset the border color
-        inputError.style.display = 'none';
-      }
-    });
-
-    document.querySelectorAll('.save-map').forEach((button) => {button.addEventListener('click', () => {
-      this.mindmap.saveCanvasStateToFile()});
-    });
-    document.querySelectorAll('.load-map').forEach((button) => {button.addEventListener('click', () => {
-      document.getElementById('file-input').click()});
-    });
-    document.getElementById('file-input').addEventListener('change', (event) =>
-      this.loadCanvasState(event));
-
-    // Add an event listener to resize the canvas whenever the window is resized
-    window.addEventListener('resize', () => this.resizeCanvas());
-
-    document.querySelectorAll('.new-map').forEach((button) => {
-      button.addEventListener('click', () =>
-        this.newMap());
-    });
-
-    // History state
-    window.addEventListener('popstate', (event) => {
-      if (event.state) {
-        //this.newMap()
-        this.mindmap.loadData(event.state);
-        this.render();
-      }
-    });
+    this.initButtons();
+    this.initHistory();
   }
 
   initEvents() {
@@ -104,285 +31,38 @@ class Canvas {
     this.canvas.addEventListener('mouseup', this.onMouseUp.bind(this));
     document.addEventListener('keydown', this.onKeyDown.bind(this));
     this.canvas.addEventListener('dblclick', this.onDoubleClick.bind(this));
-    this.canvas.addEventListener('contextmenu', this.onContextMenu.bind(this));
-    document.getElementById('context-menu').addEventListener('click', this.onContextMenuClick.bind(this));
-    document.getElementById('context-menu-on-node').addEventListener('click', this.onContextMenuClickOnNode.bind(this));
-    window.addEventListener('click', this.onWindowClick.bind(this));
-
-    // Touch events
     this.canvas.addEventListener('touchstart', this.onTouchStart.bind(this));
     this.canvas.addEventListener('touchmove', this.onTouchMove.bind(this));
     this.canvas.addEventListener('touchend', this.onTouchEnd.bind(this));
   }
 
-  // Right-click on canvas
-  onContextMenu(e) {
-    // Close opened context menu
-    this.onWindowClick(e);
-
-    e.preventDefault();
-
-    const x = e.offsetX;
-    const y = e.offsetY;
-    const clickedNode = this.mindmap.nodes.find(node => this.isPointInNode(x, y, node));
-
-    if (clickedNode) {
-      this.selectedNode = clickedNode;
-    } else {
-      this.selectedNode = null;
-    }
-
-    this.contextMenuX = e.clientX;
-    this.contextMenuY = e.clientY;
-    this.showContextMenu();
-    this.render();
-  }
-
-  // Show the placeholder
-  showPlaceholder() {
-    document.getElementById('canvas-placeholder-on-drag').style.display = 'block';
-  }
-
-  // Hide the placeholder
-  hidePlaceholder() {
-    document.getElementById('canvas-placeholder-on-drag').style.display = 'none';
-  }
-
-  showContextMenu() {
-    let contextMenu = document.getElementById('context-menu');
-    if (this.selectedNode) {
-      contextMenu = document.getElementById('context-menu-on-node');
-    }
-    contextMenu.style.display = 'block';
-    contextMenu.style.left = `${this.contextMenuX}px`;
-    contextMenu.style.top = `${this.contextMenuY}px`;
-    this.contextMenuVisible = true;
-  }
-
-  hideContextMenu() {
-    const contextMenu = document.getElementById('context-menu');
-    const contextMenuOnNode = document.getElementById('context-menu-on-node');
-    contextMenu.style.display = 'none';
-    contextMenuOnNode.style.display = 'none';
-    this.contextMenuVisible = false;
-  }
-
-  onContextMenuClick(e) {
-    const targetId = e.target.id;
-
-    if (targetId === 'create-node') {
-      let canvasOffset = this.canvas.getBoundingClientRect();
-      this.selectedNode = this.mindmap.addNode('New Node', this.contextMenuX - canvasOffset.x,
-        this.contextMenuY - canvasOffset.y);
-      this.showInputField();
-      this.inputField.setValue(this.selectedNode.text);
-      this.inputField.focus();
-      this.render();
-    }
-    this.hideContextMenu();
-  }
-
-  onContextMenuClickOnNode(e) {
-    const targetId = e.target.id;
-
-    if (targetId === 'delete-node' && this.selectedNode) {
-      this.mindmap.removeNode(this.selectedNode);
-      this.selectedNode = null;
-      this.render();
-    } else if (targetId === 'edit-node' && this.selectedNode) {
-      this.showInputField();
-      this.inputField.setValue(this.selectedNode.text);
-      this.inputField.focus();
-      this.render();
-    } else if (targetId === 'connect-nodes') {
-      this.connectingNodes = this.selectedNode;
-    }
-    this.hideContextMenu();
-  }
-
-  showErrorModal(message) {
-    const errorModal = document.getElementById('error-modal');
-    const errorMessage = document.getElementById('error-message');
-    const closeErrorButton = document.getElementById('close-error-button');
-
-    errorMessage.textContent = message;
-    errorModal.classList.add('show');
-
-    closeErrorButton.addEventListener('click', hideErrorModal);
-    window.addEventListener('click', outsideClickHandler);
-
-    function hideErrorModal() {
-      errorModal.classList.remove('show');
-      closeErrorButton.removeEventListener('click', hideErrorModal);
-      window.removeEventListener('click', outsideClickHandler);
-    }
-
-    function outsideClickHandler(event) {
-      if (!errorModal.contains(event.target)) {
-        hideErrorModal();
-      }
-    }
-  }
-
-  onKeyDown(e) {
-    if ((e.key === 'Delete' || e.key === 'Backspace') && this.isHidden()) {
-      if (this.selectedNode) {
-        this.mindmap.removeNode(this.selectedNode);
-        this.selectedNode = null;
-        this.render();
-      }
-    }
-  }
-
-  isHidden() {
-    if (this.inputField && this.inputField.inputField) {
-      return this.inputField.inputField !== document.activeElement;
-    } else {
-      return true;
-    }
-  }
-
-  onMouseMove(e) {
-    if (this.isDrawing && this.selectedNode) {
-      const x = e.offsetX - this.startX;
-      const y = e.offsetY - this.startY;
-      this.selectedNode.move(x, y);
-      this.render();
-    }
-  }
-
-  onMouseDown(e) {
-    const rect = this.canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    const clickedNodes = this.mindmap.nodes
-      .filter(node => this.isPointInNode(x, y, node))
-      .sort((a, b) => b.zIndex - a.zIndex);
-    if (clickedNodes.length > 0) {
-      // If a node is clicked, set it as the selected node and delete previous selection
-      if (this.selectedNode) this.selectedNode.selectedNode = null;
-      this.selectedNode = clickedNodes[0];
-      this.selectedNode.zIndex = this.mindmap.nodes.length;
-      this.isDrawing = true;
-      this.startX = x - clickedNodes[0].x;
-      this.startY = y - clickedNodes[0].y;
-
-      // Bring the selected node to the front
-      this.mindmap.nodes = this.mindmap.nodes.filter(node => node !== this.selectedNode);
-      this.mindmap.nodes.push(this.selectedNode);
-
-      console.log(clickedNodes.zIndex);
-
-      if (this.connectingNodes) {
-        if (this.selectedNode !== this.connectingNodes) {
-          this.mindmap.connectNodes(this.selectedNode, this.connectingNodes);
-          this.connectingNodes = false;
-          this.selectedNode = null;
-        }
-      }
-    } else {
-      this.selectedNode = null;
-      if (this.connectingNodes) {
-        this.connectingNodes = false;
-      }
-    }
-    this.render();
-  }
-
-  onMouseUp() {
-    this.isDrawing = false;
-  }
-
-  onDoubleClick(e) {
-    const rect = this.canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    this.showInputField();
-
-    const clickedNode = this.mindmap.nodes.find(node => this.isPointInNode(x, y, node));
-    if (clickedNode) {
-      this.inputField.setValue(clickedNode.text);
-    } else {
-      const newNode = this.mindmap.addNode('New Node', x, y);
-      this.selectedNode = newNode;
-      this.render();
-      this.inputField.setValue(newNode.text);
-    }
-  }
-
-  onWindowClick(e) {
-    if (!this.contextMenuVisible) return;
-
-    const contextMenu = document.getElementById('context-menu');
-    const isClickInsideContextMenu = contextMenu.contains(e.target);
-
-    if (!isClickInsideContextMenu) {
-      this.hideContextMenu();
-    }
-  }
-
-  isPointInNode(x, y, node = this.selectedNode) {
-    if (!node) {
-      return false;
-    }
-    return (
-      x >= node.x &&
-      x <= node.x + node.width &&
-      y >= node.y &&
-      y <= node.y + node.height
+  initButtons() {
+    document.querySelectorAll('.save-map').forEach((button) => {
+      button.addEventListener('click', () => {
+        this.mindmap.saveCanvasStateToFile();
+      });
+    });
+    document.querySelectorAll('.load-map').forEach((button) => {
+      button.addEventListener('click', () => {
+        document.getElementById('file-input').click();
+      });
+    });
+    document.getElementById('file-input').addEventListener('change', (event) =>
+      this.loadCanvasState(event)
     );
-  }
 
-  onInputFieldEnterOrEscape(e) {
-    if (e.key === 'Enter') {
-      if (this.inputField.getValue().length <= 100 && this.inputField.getValue().trim() !== '') {
-        this.selectedNode.text = this.inputField.getValue();
-        try {
-          this.inputField.inputField.style.display = 'none';
-        } catch (e) {}
-        this.render();
-      }
-    }
-    if (e.key === 'Escape') {
-      this.onInputFieldBlur()
-    }
-  }
-
-  onInputFieldBlur() {
-    try {
-      this.inputField.inputField.style.display = 'none';
-      document.querySelector('#input-error').style.display = 'none';
-    } catch (e) {
-    }
-  }
-
-  showInputField() {
-    this.inputField.inputField.style.display = 'block';
-
-    this.inputField.focus();
-
-    // Add an input event listener to resize the node when the input field's value changes
-    this.inputField.inputField.addEventListener('input', () => {
-      // Check if the input is empty or exceeds the maximum length
-      if (this.inputField.getValue().length <= 100 && this.inputField.getValue().trim() !== '') {
-        this.selectedNode.text = this.inputField.getValue();
-        this.render();
-      }
+    document.querySelectorAll('.new-map').forEach((button) => {
+      button.addEventListener('click', () => this.newMap());
     });
   }
 
-  newMap() {
-    this.mindmap.nodes = [];
-    this.mindmap.connectors = [];
-    localStorage.removeItem('canvasState');
-    this.render();
-  }
-
-  onAddNodeClick() {
-    this.mindmap.addNode('New Node', 100, 100);
-    this.render();
+  initHistory() {
+    window.addEventListener('popstate', (event) => {
+      if (event.state) {
+        this.mindmap.loadData(event.state);
+        this.render();
+      }
+    });
   }
 
   render() {
@@ -413,6 +93,148 @@ class Canvas {
     this.mindmap.saveCanvasStateToLocalStorage();
   }
 
+  resizeCanvas() {
+    this.canvas.width = this.canvas.offsetWidth;
+    this.canvas.height = this.canvas.offsetHeight;
+    this.render();
+  }
+
+  onMouseDown(e) {
+    const rect = this.canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const clickedNodes = this.mindmap.nodes
+      .filter(node => this.isPointInNode(x, y, node))
+      .sort((a, b) => b.zIndex - a.zIndex);
+
+    if (clickedNodes.length > 0) {
+      if (this.selectedNode) this.selectedNode.selectedNode = null;
+      this.selectedNode = clickedNodes[0];
+      this.selectedNode.zIndex = this.mindmap.nodes.length;
+      this.isDrawing = true;
+      this.startX = x - clickedNodes[0].x;
+      this.startY = y - clickedNodes[0].y;
+
+      this.mindmap.nodes = this.mindmap.nodes.filter(node => node !== this.selectedNode);
+      this.mindmap.nodes.push(this.selectedNode);
+
+      if (this.connectingNodes) {
+        if (this.selectedNode !== this.connectingNodes) {
+          this.mindmap.connectNodes(this.selectedNode, this.connectingNodes);
+          this.connectingNodes = false;
+          this.selectedNode = null;
+        }
+      }
+    } else {
+      this.selectedNode = null;
+      if (this.connectingNodes) {
+        this.connectingNodes = false;
+      }
+    }
+    this.render();
+  }
+
+  onMouseMove(e) {
+    if (this.isDrawing && this.selectedNode) {
+      const x = e.offsetX - this.startX;
+      const y = e.offsetY - this.startY;
+      this.selectedNode.move(x, y);
+      this.render();
+    }
+  }
+
+  onMouseUp() {
+    this.isDrawing = false;
+  }
+
+  onDoubleClick(e) {
+    const rect = this.canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    this.showInputField();
+
+    const clickedNode = this.mindmap.nodes.find(node => this.isPointInNode(x, y, node));
+    if (clickedNode) {
+      this.inputField.setValue(clickedNode.text);
+    } else {
+      const newNode = this.mindmap.addNode('New Node', x, y);
+      this.selectedNode = newNode;
+      this.render();
+      this.inputField.setValue(newNode.text);
+    }
+  }
+
+  onKeyDown(e) {
+    if ((e.key === 'Delete' || e.key === 'Backspace') && this.isHidden()) {
+      if (this.selectedNode) {
+        this.mindmap.removeNode(this.selectedNode);
+        this.selectedNode = null;
+        this.render();
+      }
+    }
+  }
+
+  isHidden() {
+    if (this.inputField && this.inputField.inputField) {
+      return this.inputField.inputField !== document.activeElement;
+    } else {
+      return true;
+    }
+  }
+
+  showInputField() {
+    this.inputField.show();
+    this.inputField.inputField.addEventListener('input', () => {
+      if (this.inputField.getValue().length <= 100 && this.inputField.getValue().trim() !== '') {
+        this.selectedNode.text = this.inputField.getValue();
+        this.render();
+      }
+    });
+  }
+
+  onInputFieldEnterOrEscape(e) {
+    if (e.key === 'Enter') {
+      if (this.inputField.getValue().length <= 100 && this.inputField.getValue().trim() !== '') {
+        this.selectedNode.text = this.inputField.getValue();
+        try {
+          this.inputField.inputField.style.display = 'none';
+        } catch (e) {}
+        this.render();
+      }
+    }
+    if (e.key === 'Escape') {
+      this.onInputFieldBlur();
+    }
+  }
+
+  onInputFieldBlur() {
+    try {
+      this.inputField.inputField.style.display = 'none';
+      document.querySelector('#input-error').style.display = 'none';
+    } catch (e) {}
+  }
+
+  newMap() {
+    this.mindmap.nodes = [];
+    this.mindmap.connectors = [];
+    localStorage.removeItem('canvasState');
+    this.render();
+  }
+
+  isPointInNode(x, y, node = this.selectedNode) {
+    if (!node) {
+      return false;
+    }
+    return (
+      x >= node.x &&
+      x <= node.x + node.width &&
+      y >= node.y &&
+      y <= node.y + node.height
+    );
+  }
+
   loadCanvasState(event) {
     const file = event.target.files[0];
     if (file) {
@@ -429,7 +251,6 @@ class Canvas {
       };
       reader.readAsText(file);
     }
-    // Reset the file input value to allow the same file to be selected again
     event.target.value = '';
   }
 
@@ -446,7 +267,31 @@ class Canvas {
         this.showErrorModal('Error parsing JSON, wrong file input! Use only files saved by this app.');
       }
     };
-    reader.readAsText(file); // Read the file as text
+    reader.readAsText(file);
+  }
+
+  showErrorModal(message) {
+    const errorModal = document.getElementById('error-modal');
+    const errorMessage = document.getElementById('error-message');
+    const closeErrorButton = document.getElementById('close-error-button');
+
+    errorMessage.textContent = message;
+    errorModal.classList.add('show');
+
+    closeErrorButton.addEventListener('click', hideErrorModal);
+    window.addEventListener('click', outsideClickHandler);
+
+    function hideErrorModal() {
+      errorModal.classList.remove('show');
+      closeErrorButton.removeEventListener('click', hideErrorModal);
+      window.removeEventListener('click', outsideClickHandler);
+    }
+
+    function outsideClickHandler(event) {
+      if (!errorModal.contains(event.target)) {
+        hideErrorModal();
+      }
+    }
   }
 
   onTouchStart(e) {
@@ -473,13 +318,6 @@ class Canvas {
     e.preventDefault();
     const mouseEvent = new MouseEvent('mouseup', {});
     this.canvas.dispatchEvent(mouseEvent);
-  }
-
-  // To change the size of the canvas when the window is resized
-  resizeCanvas() {
-    this.canvas.width = this.canvas.offsetWidth;
-    this.canvas.height = this.canvas.offsetHeight;
-    this.render();
   }
 }
 

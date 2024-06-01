@@ -5,7 +5,7 @@ document.body.appendChild(tempDiv);
 const computedStyles = window.getComputedStyle(tempDiv);
 
 
-class Node {
+class BaseNode {
   constructor(text = 'New Node', x = 0, y = 0) {
     this.id = Date.now();
     this.text = text;
@@ -101,4 +101,4 @@ class Node {
   }
 }
 
-export default Node;
+export default BaseNode;

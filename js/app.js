@@ -1,28 +1,29 @@
-// app.js
-
 import MindMap from './mindmap.js';
 import Storage from './data/storage.js';
 import Canvas from './components/Canvas.js';
 
 const App = {
-  init() {
-    this.mindmap = new MindMap();
+  async init() {
     this.storage = new Storage();
-    this.canvas = new Canvas('mindmap-canvas', this.mindmap);
-    this.initLocalStorage();
-    this.initCanvasEvents();
+    this.mindmap = new MindMap();
+    await this.initLocalStorage();
     this.initPopups();
     this.initLoadingScreen();
     this.initNetworkStatus();
     this.initHamburgerMenu();
     this.initNodeActions();
+    this.canvas = new Canvas('mindmap-canvas', this.mindmap);
+    this.initCanvasEvents();
   },
 
   initLocalStorage() {
-    const savedData = this.storage.loadData();
-    if (savedData) {
-      this.mindmap.loadDataFromLocalStorage(savedData);
-    }
+    return new Promise((resolve) => {
+      const savedData = this.storage.loadData();
+      if (savedData) {
+        this.mindmap.loadDataFromLocalStorage(savedData);
+      }
+      resolve();
+    });
   },
 
   initCanvasEvents() {
@@ -149,3 +150,5 @@ const App = {
 document.addEventListener('DOMContentLoaded', () => {
   App.init();
 });
+
+export default App;

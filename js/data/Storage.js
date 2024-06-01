@@ -1,5 +1,5 @@
 class Storage {
-  static saveData(state) {
+  saveData(state) {
     const stateJson = JSON.stringify(state);
     localStorage.setItem('canvasState', stateJson);
     console.log('saveData', state);
@@ -15,4 +15,4 @@ class Storage {
   }
 }
 
-export default Storage
+export default Storage;

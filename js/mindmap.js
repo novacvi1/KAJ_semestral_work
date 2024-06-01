@@ -1,10 +1,10 @@
-// mindmap.js
-
-import Node from './components/node.js';
+import BaseNode from './components/BaseNode.js';
 import Connector from './components/connector.js';
-import storage from './data/storage.js';
+import Storage from './data/Storage.js';
 
+const storage = new Storage();
 const destroySound = new Audio('./node_destruction_sound.mp3');
+
 
 class MindMap {
   constructor() {
@@ -13,7 +13,7 @@ class MindMap {
   }
 
   addNode(text, x, y) {
-    const node = new Node(text, x, y);
+    const node = new BaseNode(text, x, y);
     this.nodes.push(node);
     this.saveCanvasStateToHistory();
     return node;
@@ -49,14 +49,16 @@ class MindMap {
   }
 
   loadDataFromLocalStorage(data) {
-    this.nodes = data.nodes.map((nodeData) => new Node().loadData(nodeData));
-    const nodeMap = this.nodes.reduce((map, node) => {
-      map[node.id] = node;
-      return map;
-    }, {});
-    this.connectors = data.connectors.map(
-      (connectorData) => new Connector().loadData(connectorData, nodeMap)
-    );
+    if (data) {
+      this.nodes = data.nodes.map((nodeData) => new BaseNode().loadData(nodeData));
+      const nodeMap = this.nodes.reduce((map, node) => {
+        map[node.id] = node;
+        return map;
+      }, {});
+      this.connectors = data.connectors.map(
+        (connectorData) => new Connector().loadData(connectorData, nodeMap)
+      );
+    }
   }
 
   saveCanvasStateToFile() {
@@ -74,7 +76,7 @@ class MindMap {
   }
 
   loadData(state) {
-    this.nodes = state.nodes.map((nodeData) => new Node().loadData(nodeData));
+    this.nodes = state.nodes.map((nodeData) => new BaseNode().loadData(nodeData));
     const nodeMap = this.nodes.reduce((map, node) => {
       map[node.id] = node;
       return map;
@@ -90,7 +92,7 @@ class MindMap {
   }
 
   saveCanvasStateToLocalStorage() {
-    storage.saveData(this.getData());
+    storage.saveData(this.getData()); // Save the current state of the mind map to local storage
   }
 
   playDestroySound() {
