@@ -96,7 +96,7 @@ class MindMap {
   }
 
   playDestroySound() {
-    destroySound.play().catch((error) => {});
+    destroySound.play().catch(() => {});
     setTimeout(() => {
       destroySound.pause();
       destroySound.currentTime = 0;

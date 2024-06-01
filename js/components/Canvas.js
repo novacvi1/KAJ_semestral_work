@@ -34,6 +34,7 @@ class Canvas {
     this.canvas.addEventListener('touchstart', this.onTouchStart.bind(this));
     this.canvas.addEventListener('touchmove', this.onTouchMove.bind(this));
     this.canvas.addEventListener('touchend', this.onTouchEnd.bind(this));
+    window.addEventListener('resize', this.resizeCanvas.bind(this));
   }
 
   initButtons() {
