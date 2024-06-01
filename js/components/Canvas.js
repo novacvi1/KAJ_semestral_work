@@ -71,10 +71,11 @@ class Canvas {
       }
     });
 
-    document.getElementById('save-map').addEventListener('click', () =>
-      this.mindmap.saveCanvasStateToFile());
-    document.getElementById('load-map').addEventListener('click', () => {
-      document.getElementById('file-input').click();
+    document.querySelectorAll('.save-map').forEach((button) => {button.addEventListener('click', () => {
+      this.mindmap.saveCanvasStateToFile()});
+    });
+    document.querySelectorAll('.load-map').forEach((button) => {button.addEventListener('click', () => {
+      document.getElementById('file-input').click()});
     });
     document.getElementById('file-input').addEventListener('change', (event) =>
       this.loadCanvasState(event));
@@ -82,7 +83,10 @@ class Canvas {
     // Add an event listener to resize the canvas whenever the window is resized
     window.addEventListener('resize', () => this.resizeCanvas());
 
-    document.getElementById('new-map').addEventListener('click', () => this.newMap());
+    document.querySelectorAll('.new-map').forEach((button) => {
+      button.addEventListener('click', () =>
+        this.newMap());
+    });
 
     // History state
     window.addEventListener('popstate', (event) => {
@@ -104,6 +108,11 @@ class Canvas {
     document.getElementById('context-menu').addEventListener('click', this.onContextMenuClick.bind(this));
     document.getElementById('context-menu-on-node').addEventListener('click', this.onContextMenuClickOnNode.bind(this));
     window.addEventListener('click', this.onWindowClick.bind(this));
+
+    // Touch events
+    this.canvas.addEventListener('touchstart', this.onTouchStart.bind(this));
+    this.canvas.addEventListener('touchmove', this.onTouchMove.bind(this));
+    this.canvas.addEventListener('touchend', this.onTouchEnd.bind(this));
   }
 
   // Right-click on canvas
@@ -433,6 +442,32 @@ class Canvas {
       }
     };
     reader.readAsText(file); // Read the file as text
+  }
+
+  onTouchStart(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const mouseEvent = new MouseEvent('mousedown', {
+      clientX: touch.clientX,
+      clientY: touch.clientY
+    });
+    this.canvas.dispatchEvent(mouseEvent);
+  }
+
+  onTouchMove(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const mouseEvent = new MouseEvent('mousemove', {
+      clientX: touch.clientX,
+      clientY: touch.clientY
+    });
+    this.canvas.dispatchEvent(mouseEvent);
+  }
+
+  onTouchEnd(e) {
+    e.preventDefault();
+    const mouseEvent = new MouseEvent('mouseup', {});
+    this.canvas.dispatchEvent(mouseEvent);
   }
 
   // To change the size of the canvas when the window is resized

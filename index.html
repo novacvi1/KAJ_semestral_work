@@ -8,15 +8,37 @@
 </head>
 <body>
 <header>
-  <h1>Mindmap App</h1>
-  <nav>
+  <section class="header-content">
+    <div class="hamburger" id="hamburger-button">&#9776;</div>
+    <h1>Mindmap App</h1>
+    <div class="info-button" id="info-button">ℹ</div>
+  </section>
+<nav>
+    <div id="nav-menu">
+      <ul>
+        <li class="new-map">New</li>
+        <li class="save-map">Save</li>
+        <li class="load-map">Load</li>
+        <li class="info-button">ℹ</li>
+      </ul>
+    </div>
+  <div id="mobile-toolbar">
     <ul>
-      <li id="new-map">New</li>
-      <li id="save-map">Save</li>
-      <li id="load-map">Load</li>
-      <li id="info-button">ℹ</li>
+      <li id="create-node-button">New Node</li>
+      <li id="delete-node-button">Delete Node</li>
+      <li id="edit-node-button">Edit Node</li>
+      <li id="connect-nodes-button">Connect Nodes</li>
     </ul>
-  </nav>
+  </div>
+</nav>
+<div class="drawer" id="drawer">
+  <div id="back-button">&times;</div>
+  <ul>
+    <li class="new-map">New</li>
+    <li class="save-map">Save</li>
+    <li class="load-map">Load</li>
+  </ul>
+</div>
 </header>
 <main>
   <div id="canvas-container" class="drag-zone">

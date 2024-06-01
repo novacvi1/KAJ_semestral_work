@@ -183,9 +183,9 @@ header nav li:hover {
   border: 5px solid #f7f7f7;
 }
 
-#info-popup, #network-status-popup {
+.modal, #info-popup, #network-status-popup {
   position: fixed;
-  top: 20%;
+  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   background-color: white;
@@ -194,6 +194,9 @@ header nav li:hover {
   -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   -moz-box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+#info-popup, #network-status-popup {
   opacity: 0;
   pointer-events: none;
   -webkit-transition: opacity 0.8s ease;
@@ -322,17 +325,7 @@ line {
 
 .modal {
   visibility: hidden; /* Hidden by default */
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: white;
-  padding: 20px;
-  border-radius: 5px;
-  -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-  -moz-box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-  z-index: 1000; /* Ensure the modal is above other elements */
+  z-index: 1001; /* Ensure the modal is above other elements */
   opacity: 0;
   -webkit-transition: opacity 0.8s ease, visibility 0.8s ease;
   -moz-transition: opacity 0.8s ease, visibility 0.8s ease;
@@ -382,4 +375,95 @@ line {
   bottom: 0;
   left: 0;
   z-index: 9999;
+}
+
+h1 {
+  text-align: center;
+  flex-grow: 1;
+}
+
+/* Mobile styles */
+.hamburger {
+  display: none;
+  font-size: 24px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#info-button {
+  display: none;
+}
+
+#mobile-toolbar {
+  display: none;
+}
+
+/* Media queries to show/hide hamburger menu and drawer */
+@media only screen and (max-width: 600px) {
+  .hamburger {
+    display: block;
+  }
+
+  #info-button {
+    display: block;
+  }
+
+  #nav-menu {
+    display: none;
+  }
+
+  #mobile-toolbar {
+    display: block;
+  }
+}
+
+/* Drawer styles */
+.drawer {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 250px;
+  height: 100%;
+  background-color: #333;
+  color: white;
+  transform: translateX(-100%);
+  -webkit-transition: transform 0.3s ease;
+  -moz-transition: transform 0.3s ease;
+  -o-transition: transform 0.3s ease;
+  transition: transform 0.3s ease;
+  padding-top: 50px;
+  z-index: 1000;
+}
+.drawer ul {
+  padding: 0;
+}
+.drawer li {
+  padding: 15px;
+  cursor: pointer;
+}
+.drawer li:hover {
+  background-color: #444;
+}
+
+/* Open state for the drawer */
+.drawer.open {
+  transform: translateX(0);
+}
+
+#back-button {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+
+#back-button:hover {
+  background-color: #444;
+  cursor: pointer;
 }

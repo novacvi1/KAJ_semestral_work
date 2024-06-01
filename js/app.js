@@ -20,24 +20,28 @@ toolBar.initEvents()
 
 // Pop-up info
 const infoPopup = document.getElementById('info-popup');
-const showInfoButton = document.getElementById('info-button');
+document.addEventListener('DOMContentLoaded', () => {
+  const showInfoButton = document.querySelectorAll('.info-button');
 
-showInfoButton.addEventListener('click', () => {
-  infoPopup.classList.add('show');
-});
+  showInfoButton.forEach((button) => {
+    button.addEventListener('click', () => {
+      infoPopup.classList.add('show');
+    });
+  });
 
-// Hide the pop-up
-const closeButton = document.getElementById('close-popup');
+  // Hide the pop-up
+  const closeButton = document.getElementById('close-popup');
 
-closeButton.addEventListener('click', () => {
-  infoPopup.classList.remove('show');
-});
-
-document.addEventListener('click', (event) => {
-  // Check if the click was outside the pop-up
-  if (!infoPopup.contains(event.target) && event.target !== showInfoButton) {
+  closeButton.addEventListener('click', () => {
     infoPopup.classList.remove('show');
-  }
+  });
+
+  document.addEventListener('click', (event) => {
+    // Check if the click was outside the pop-up
+    if (!infoPopup.contains(event.target) && !Array.from(showInfoButton).some(button => button === event.target)) {
+      infoPopup.classList.remove('show');
+    }
+  });
 });
 
 // Loading screen
@@ -76,3 +80,61 @@ if (navigator.onLine) {
   showNetworkStatusPopup('You are offline');
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+  const hamburger = document.getElementById('hamburger-button');
+  const drawer = document.getElementById('drawer');
+  const backButton = document.getElementById('back-button');
+
+  hamburger.addEventListener('click', () => {
+    drawer.classList.toggle('open');
+  });
+
+  backButton.addEventListener('click', () => {
+    drawer.classList.remove('open');
+  });
+
+  document.getElementById('create-node-button').addEventListener('click', () => {
+    console.log('Create node clicked');
+    toolBar.onAddNodeClick();
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!drawer.contains(event.target) && event.target !== hamburger) {
+      drawer.classList.remove('open');
+    }
+  });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const createNodeButton = document.getElementById('create-node-button');
+  const deleteNodeButton = document.getElementById('delete-node-button');
+  const editNodeButton = document.getElementById('edit-node-button');
+  const connectNodesButton = document.getElementById('connect-nodes-button');
+
+  createNodeButton.addEventListener('click', () => {
+    toolBar.onAddNodeClick();
+  });
+
+  deleteNodeButton.addEventListener('click', () => {
+    if (canvas.selectedNode) {
+      mindmap.removeNode(canvas.selectedNode);
+      canvas.selectedNode = null;
+      canvas.render();
+    }
+  });
+
+  editNodeButton.addEventListener('click', () => {
+    if (canvas.selectedNode) {
+      canvas.showInputField();
+      canvas.inputField.setValue(canvas.selectedNode.text);
+      canvas.inputField.focus();
+      canvas.render();
+    }
+  });
+
+  connectNodesButton.addEventListener('click', () => {
+    if (canvas.selectedNode) {
+      canvas.connectingNodes = canvas.selectedNode;
+    }
+  });
+});
