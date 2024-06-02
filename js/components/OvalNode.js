@@ -9,8 +9,8 @@ const computedStyles = window.getComputedStyle(tempDiv);
 class OvalNode extends BaseNode {
   constructor(text, x, y) {
     super(String(text).substring(0, 17), x, y); // Limit the text input to 17 letters
-    this.radiusX = 100; // Set the horizontal radius for the oval
-    this.radiusY = 50; // Set the vertical radius for the oval
+    this.radiusX = 100; // Horizontal radius for the oval
+    this.radiusY = 50; // Vertical radius for the oval
     this.type = 'oval';
   }
 
