@@ -165,6 +165,7 @@ const App = {
 
   initNetworkStatus() {
     const networkStatusPopup = document.getElementById('network-status-popup');
+    let wasOffline = !navigator.onLine; // Initialize with the current network status
 
     function showNetworkStatusPopup(message) {
       setTimeout(() => {
@@ -177,16 +178,18 @@ const App = {
     }
 
     window.addEventListener('online', () => {
-      showNetworkStatusPopup('You are online');
+      if (wasOffline) { // Only show the message if the previous status was offline
+        showNetworkStatusPopup('You are online');
+      }
+      wasOffline = false; // Update the previous status
     });
 
     window.addEventListener('offline', () => {
       showNetworkStatusPopup('You are offline');
+      wasOffline = true; // Update the previous status
     });
 
-    if (navigator.onLine) {
-      showNetworkStatusPopup('You are online');
-    } else {
+    if (!navigator.onLine) {
       showNetworkStatusPopup('You are offline');
     }
   },

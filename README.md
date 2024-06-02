@@ -88,5 +88,5 @@ Done each point of the evaluation scorecard.
 | Use of advance JS APIs      | LocalStorage in `Storage.js`, File API in `mindmap.js` and Drag and Drop in `DropZone.js`               |
 | Functional history          | History API used in `mindmap.js`                                                                        |
 | Media control               | Audio used in `mindmap.js`                                                                              |
-| Offline application         | States about connection done in `app.js`                                                                |
+| Offline application         | States about connection done in `app.js`, offline shows each time, but online shows only after offline  |
 | JS work with SVG            | In `app.js` creation, changes and event with SVG loading screen                                         |

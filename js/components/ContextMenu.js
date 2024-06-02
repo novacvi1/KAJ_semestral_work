@@ -90,7 +90,7 @@ class ContextMenu {
     const newNodeButton = document.getElementById('create-node-button');
     const nodeTypeContextMenu = document.getElementById('node-type-context-menu');
 
-    if (window.innerWidth <= 768) {
+    if (window.innerWidth <= 600) {
       if (!nodeTypeContextMenu.contains(e.target) && !newNodeButton.contains(e.target)) {
         this.hideNodeTypeContextMenu();
       }

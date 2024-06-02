@@ -196,13 +196,24 @@ header nav li:hover {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
-#info-popup, #network-status-popup {
+#info-popup {
   opacity: 0;
   pointer-events: none;
   -webkit-transition: opacity 0.8s ease;
   -moz-transition: opacity 0.8s ease;
   -o-transition: opacity 0.8s ease;
   transition: opacity 0.8s ease;
+}
+
+#network-status-popup {
+  display: none;
+  opacity: 1;
+  pointer-events: none;
+  -webkit-transition: opacity 0.8s ease;
+  -moz-transition: opacity 0.8s ease;
+  -o-transition: opacity 0.8s ease;
+  transition: opacity 0.8s ease;
+  z-index: 1000;
 }
 
 #close-popup {
