@@ -50,8 +50,6 @@ class BaseNode {
     // Adjust the height of the node for each new line
     this.height = ((lines.length) * (lineHeight)) + paddingVertical * 2; // Add padding to the height calculation
 
-    console.log(this.height, this.width)
-
     ctx.save();
     ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
     ctx.fillStyle = '#fff';
