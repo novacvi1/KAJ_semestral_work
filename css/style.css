@@ -428,7 +428,7 @@ h1 {
   display: none;
 }
 
-/* Media queries to show/hide hamburger menu and drawer */
+/* Media queries to show/hide hamburger menu other buttons */
 @media only screen and (max-width: 600px) {
   #info-button, #mobile-toolbar, #info-mobile-content, .hamburger {
     display: block;
