@@ -73,7 +73,7 @@ main {
   height: 100%;
 }
 
-#context-menu, #context-menu-on-node {
+.context-menu, #context-menu-on-node {
   display: none;
   position: absolute;
   background-color: #fff;
@@ -82,11 +82,11 @@ main {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-#context-menu ul, #context-menu-on-node ul {
+.context-menu ul, #context-menu-on-node ul {
   list-style-type: none;
 }
 
-#context-menu li, #context-menu-on-node li {
+.context-menu li, #context-menu-on-node li {
   padding: 5px 10px;
   cursor: pointer;
   -webkit-transition: background-color 0.3s ease;
@@ -94,7 +94,7 @@ main {
   transition: background-color 0.3s ease;
 }
 
-#context-menu li:hover, #context-menu-on-node li:hover {
+.context-menu li:hover, #context-menu-on-node li:hover {
   background-color: #f7f7f7;
 }
 

@@ -2,6 +2,8 @@ import MindMap from './mindmap.js';
 import Storage from './data/storage.js';
 import Canvas from './components/Canvas.js';
 
+const createNodeButton = document.getElementById('create-node-button');
+
 const App = {
   init() {
     this.storage = new Storage();
@@ -104,13 +106,12 @@ const App = {
   },
 
   initNodeActions() {
-    const createNodeButton = document.getElementById('create-node-button');
     const deleteNodeButton = document.getElementById('delete-node-button');
     const editNodeButton = document.getElementById('edit-node-button');
     const connectNodesButton = document.getElementById('connect-nodes-button');
 
     createNodeButton.addEventListener('click', () => {
-      this.mindmap.addNode('New Node', 100, 100);
+      this.nodeOptions();
       this.canvas.render();
     });
 
@@ -122,13 +123,14 @@ const App = {
       }
     });
 
-    editNodeButton.addEventListener('click', () => {
-      if (this.canvas.selectedNode) {
-        this.canvas.showInputField();
-        this.canvas.inputField.setValue(this.canvas.selectedNode.text);
-        this.canvas.inputField.focus();
-        this.canvas.render();
-      }
+    editNodeButton.addEventListener('click', (event) => {
+      this.canvas.contextMenu.showNodeTypeContextMenu(event.x, event.y);
+      // if (this.canvas.selectedNode) {
+      //   this.canvas.showInputField();
+      //   // this.canvas.inputField.setValue(this.canvas.selectedNode.text);
+      //   // this.canvas.inputField.focus();
+      //   this.canvas.render();
+      // }
     });
 
     connectNodesButton.addEventListener('click', () => {
@@ -136,6 +138,16 @@ const App = {
         this.canvas.connectingNodes = this.canvas.selectedNode;
       }
     });
+  },
+
+  nodeOptions() {
+    const rect = createNodeButton.getBoundingClientRect();
+    const nodeTypeContextMenu = document.getElementById('node-type-context-menu');
+
+    nodeTypeContextMenu.style.top = `${rect.bottom}px`;
+    nodeTypeContextMenu.style.left = `${rect.left}px`;
+
+    nodeTypeContextMenu.style.display = 'block';
   }
 };
 

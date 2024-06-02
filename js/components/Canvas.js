@@ -14,8 +14,8 @@ class Canvas {
     this.startY = 0;
     this.connectingNodes = false;
 
-    this.contextMenu = new ContextMenu(this);
     this.inputField = new InputField(this.canvas, this.onInputFieldEnterOrEscape.bind(this), this.onInputFieldBlur.bind(this));
+    this.contextMenu = new ContextMenu(this, this.inputField);
     this.nodeInput = new NodeInput('.node-input', 'input-error', this);
     new DropZone('.drag-zone', '#drop-area', this);
 
@@ -154,16 +154,14 @@ class Canvas {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    this.showInputField();
+    //this.showInputField();
 
     const clickedNode = this.mindmap.nodes.find(node => this.isPointInNode(x, y, node));
     if (clickedNode) {
-      this.inputField.setValue(clickedNode.text);
+      this.showInputField()
+      // this.inputField.setValue(clickedNode.text);
     } else {
-      const newNode = this.mindmap.addNode('New Node', x, y);
-      this.selectedNode = newNode;
-      this.render();
-      this.inputField.setValue(newNode.text);
+      this.contextMenu.showNodeTypeContextMenu(e.clientX, e.clientY);
     }
   }
 
@@ -183,16 +181,6 @@ class Canvas {
     } else {
       return true;
     }
-  }
-
-  showInputField() {
-    this.inputField.show();
-    this.inputField.inputField.addEventListener('input', () => {
-      if (this.inputField.getValue().length <= 100 && this.inputField.getValue().trim() !== '') {
-        this.selectedNode.text = this.inputField.getValue();
-        this.render();
-      }
-    });
   }
 
   onInputFieldEnterOrEscape(e) {
@@ -234,6 +222,18 @@ class Canvas {
       y >= node.y &&
       y <= node.y + node.height
     );
+  }
+
+  showInputField() {
+    this.inputField.show();
+    this.inputField.focus();
+    this.inputField.inputField.addEventListener('input', () => {
+      if (this.inputField.getValue().length <= 100 && this.inputField.getValue().trim() !== '') {
+        this.selectedNode.text = this.inputField.getValue();
+        this.render();
+      }
+    });
+    this.inputField.setValue(this.selectedNode.text);
   }
 
   loadCanvasState(event) {

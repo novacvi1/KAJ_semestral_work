@@ -1,3 +1,5 @@
+import OvalNode from './components/OvalNode.js';
+import RectangleNode from './components/RectangleNode.js';
 import BaseNode from './components/BaseNode.js';
 import Connector from './components/connector.js';
 import Storage from './data/Storage.js';
@@ -12,8 +14,15 @@ class MindMap {
     this.connectors = [];
   }
 
-  addNode(text, x, y) {
-    const node = new BaseNode(text, x, y);
+  addNodeRectangle(text, x, y) {
+    const node = new RectangleNode(text, x, y);
+    this.nodes.push(node);
+    this.saveCanvasStateToHistory();
+    return node;
+  }
+
+  addNodeOval(text, x, y) {
+    const node = new OvalNode(text, x, y);
     this.nodes.push(node);
     this.saveCanvasStateToHistory();
     return node;
