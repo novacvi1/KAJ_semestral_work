@@ -89,4 +89,4 @@ Done each point of the evaluation scorecard.
 | Functional history          | History API used in `mindmap.js`                                                                        |
 | Media control               | Audio used in `mindmap.js`                                                                              |
 | Offline application         | States about connection done in `app.js`                                                                |
-| JS work with SVG            | //TODO                                                                                                  |
+| JS work with SVG            | In `app.js` creation, changes and event with SVG loading screen                                         |

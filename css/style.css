@@ -221,6 +221,12 @@ header nav li:hover {
   display: none;
 }
 
+#loading-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .pulse {
   -webkit-animation: pulse-animation 2s infinite;
   -moz-animation: pulse-animation 2s infinite;
@@ -288,10 +294,13 @@ header nav li:hover {
   z-index: 9999; /* Ensure the loading screen is above all other elements */
 }
 
+
 #loading-screen.hide {
   opacity: 0;
   pointer-events: none;
 }
+
+
 
 line {
   stroke-dasharray: 100;

@@ -113,7 +113,7 @@ class ContextMenu {
     const targetId = e.target.id;
 
     // Check if the device is in mobile view
-    const isMobileView = window.innerWidth <= 768;
+    const isMobileView = window.innerWidth <= 600;
 
     // Use fixed coordinates for mobile view, else use click event coordinates
     const x = isMobileView ? 150 : e.clientX;
