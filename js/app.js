@@ -111,8 +111,8 @@ const App = {
     const connectNodesButton = document.getElementById('connect-nodes-button');
 
     createNodeButton.addEventListener('click', () => {
-      this.nodeOptions();
-      this.canvas.render();
+      const rect = createNodeButton.getBoundingClientRect();
+      this.canvas.contextMenu.showNodeTypeContextMenu(rect.left, rect.bottom);
     });
 
     deleteNodeButton.addEventListener('click', () => {
@@ -123,14 +123,10 @@ const App = {
       }
     });
 
-    editNodeButton.addEventListener('click', (event) => {
-      this.canvas.contextMenu.showNodeTypeContextMenu(event.x, event.y);
-      // if (this.canvas.selectedNode) {
-      //   this.canvas.showInputField();
-      //   // this.canvas.inputField.setValue(this.canvas.selectedNode.text);
-      //   // this.canvas.inputField.focus();
-      //   this.canvas.render();
-      // }
+    editNodeButton.addEventListener('click', () => {
+      if (this.canvas.selectedNode) {
+        this.canvas.showInputField();
+      }
     });
 
     connectNodesButton.addEventListener('click', () => {
@@ -139,16 +135,6 @@ const App = {
       }
     });
   },
-
-  nodeOptions() {
-    const rect = createNodeButton.getBoundingClientRect();
-    const nodeTypeContextMenu = document.getElementById('node-type-context-menu');
-
-    nodeTypeContextMenu.style.top = `${rect.bottom}px`;
-    nodeTypeContextMenu.style.left = `${rect.left}px`;
-
-    nodeTypeContextMenu.style.display = 'block';
-  }
 };
 
 document.addEventListener('DOMContentLoaded', () => {

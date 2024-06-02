@@ -10,29 +10,38 @@ const destroySound = new Audio('./node_destruction_sound.mp3');
 
 class MindMap {
   constructor() {
-    this.nodes = [];
+    this.rectangleNodes = [];
+    this.ovalNodes = [];
     this.connectors = [];
   }
 
   addNodeRectangle(text, x, y) {
     const node = new RectangleNode(text, x, y);
-    this.nodes.push(node);
+    this.rectangleNodes.push(node);
     this.saveCanvasStateToHistory();
     return node;
   }
 
   addNodeOval(text, x, y) {
     const node = new OvalNode(text, x, y);
-    this.nodes.push(node);
+    this.ovalNodes.push(node);
     this.saveCanvasStateToHistory();
     return node;
   }
 
   removeNode(node) {
-    const index = this.nodes.indexOf(node);
-    if (index !== -1) {
-      this.nodes.splice(index, 1);
-      this.removeConnectors(node);
+    if (node.type === 'rectangle') {
+      const index = this.rectangleNodes.indexOf(node);
+      if (index !== -1) {
+        this.rectangleNodes.splice(index, 1);
+        this.removeConnectors(node);
+      }
+    } else if (node.type === 'oval') {
+      const index = this.ovalNodes.indexOf(node);
+      if (index !== -1) {
+        this.ovalNodes.splice(index, 1);
+        this.removeConnectors(node);
+      }
     }
     this.saveCanvasStateToHistory();
     this.playDestroySound();
@@ -52,21 +61,31 @@ class MindMap {
 
   getData() {
     return {
-      nodes: this.nodes.map((node) => node.getData()),
+      rectangleNodes: this.rectangleNodes.map((node) => node.getData()),
+      ovalNodes: this.ovalNodes.map((node) => node.getData()),
       connectors: this.connectors.map((connector) => connector.getData()),
     };
   }
 
   loadDataFromLocalStorage(data) {
     if (data) {
-      this.nodes = data.nodes.map((nodeData) => new BaseNode().loadData(nodeData));
-      const nodeMap = this.nodes.reduce((map, node) => {
-        map[node.id] = node;
-        return map;
-      }, {});
-      this.connectors = data.connectors.map(
-        (connectorData) => new Connector().loadData(connectorData, nodeMap)
-      );
+      if (data.rectangleNodes) {
+        this.rectangleNodes = data.rectangleNodes.map((nodeData) => new RectangleNode().loadData(nodeData));
+      }
+      if (data.ovalNodes) {
+        this.ovalNodes = data.ovalNodes.map((nodeData) => new OvalNode().loadData(nodeData));
+      }
+      if (data.rectangleNodes && data.ovalNodes) {
+        const nodeMap = [...this.rectangleNodes, ...this.ovalNodes].reduce((map, node) => {
+          map[node.id] = node;
+          return map;
+        }, {});
+        if (data.connectors) {
+          this.connectors = data.connectors.map(
+            (connectorData) => new Connector().loadData(connectorData, nodeMap)
+          );
+        }
+      }
     }
   }
 
@@ -85,8 +104,9 @@ class MindMap {
   }
 
   loadData(state) {
-    this.nodes = state.nodes.map((nodeData) => new BaseNode().loadData(nodeData));
-    const nodeMap = this.nodes.reduce((map, node) => {
+    this.rectangleNodes = state.rectangleNodes.map((nodeData) => new RectangleNode().loadData(nodeData));
+    this.ovalNodes = state.ovalNodes.map((nodeData) => new OvalNode().loadData(nodeData));
+    const nodeMap = [...this.rectangleNodes, ...this.ovalNodes].reduce((map, node) => {
       map[node.id] = node;
       return map;
     }, {});

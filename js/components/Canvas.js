@@ -66,11 +66,12 @@ class Canvas {
     });
   }
 
+
   render() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     const guideMessage = document.getElementById('guide-message');
-    if (this.mindmap.nodes.length === 0) {
+    if (this.mindmap.rectangleNodes.length === 0 && this.mindmap.ovalNodes.length === 0) {
       // Show guide message when there are no nodes
       guideMessage.style.display = 'flex';
     } else {
@@ -81,13 +82,25 @@ class Canvas {
         connector.render(this.ctx);
       });
 
-      // Then, render all nodes
-      this.mindmap.nodes.forEach(node => {
+      // Then, render all rectangle nodes
+      this.mindmap.rectangleNodes.forEach(node => {
         node.render(this.ctx);
 
         if (node === this.selectedNode) {
           this.ctx.fillStyle = 'rgba(255, 165, 0, 0.2)';
           this.ctx.fillRect(node.x, node.y, node.width, node.height);
+        }
+      });
+
+      // Then, render all oval nodes
+      this.mindmap.ovalNodes.forEach(node => {
+        node.render(this.ctx);
+
+        if (node === this.selectedNode) {
+          this.ctx.beginPath();
+          this.ctx.ellipse(node.x, node.y, node.radiusX, node.radiusY, 0, 0, 2 * Math.PI);
+          this.ctx.fillStyle = 'rgba(255, 165, 0, 0.2)';
+          this.ctx.fill();
         }
       });
     }
@@ -105,20 +118,25 @@ class Canvas {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    const clickedNodes = this.mindmap.nodes
+    const clickedNodes = [...this.mindmap.rectangleNodes, ...this.mindmap.ovalNodes]
       .filter(node => this.isPointInNode(x, y, node))
       .sort((a, b) => b.zIndex - a.zIndex);
 
     if (clickedNodes.length > 0) {
       if (this.selectedNode) this.selectedNode.selectedNode = null;
       this.selectedNode = clickedNodes[0];
-      this.selectedNode.zIndex = this.mindmap.nodes.length;
+      this.selectedNode.zIndex = this.mindmap.rectangleNodes.length + this.mindmap.ovalNodes.length;
       this.isDrawing = true;
       this.startX = x - clickedNodes[0].x;
       this.startY = y - clickedNodes[0].y;
 
-      this.mindmap.nodes = this.mindmap.nodes.filter(node => node !== this.selectedNode);
-      this.mindmap.nodes.push(this.selectedNode);
+      if (this.selectedNode.type === 'rectangle') {
+        this.mindmap.rectangleNodes = this.mindmap.rectangleNodes.filter(node => node !== this.selectedNode);
+        this.mindmap.rectangleNodes.push(this.selectedNode);
+      } else if (this.selectedNode.type === 'oval') {
+        this.mindmap.ovalNodes = this.mindmap.ovalNodes.filter(node => node !== this.selectedNode);
+        this.mindmap.ovalNodes.push(this.selectedNode);
+      }
 
       if (this.connectingNodes) {
         if (this.selectedNode !== this.connectingNodes) {
@@ -154,12 +172,9 @@ class Canvas {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    //this.showInputField();
-
-    const clickedNode = this.mindmap.nodes.find(node => this.isPointInNode(x, y, node));
+    const clickedNode = [...this.mindmap.rectangleNodes, ...this.mindmap.ovalNodes].find(node => this.isPointInNode(x, y, node));
     if (clickedNode) {
       this.showInputField()
-      // this.inputField.setValue(clickedNode.text);
     } else {
       this.contextMenu.showNodeTypeContextMenu(e.clientX, e.clientY);
     }
@@ -216,12 +231,18 @@ class Canvas {
     if (!node) {
       return false;
     }
-    return (
-      x >= node.x &&
-      x <= node.x + node.width &&
-      y >= node.y &&
-      y <= node.y + node.height
-    );
+    if (node.type === 'rectangle') {
+      return (
+        x >= node.x &&
+        x <= node.x + node.width &&
+        y >= node.y &&
+        y <= node.y + node.height
+      );
+    } else if (node.type === 'oval') {
+      const dx = x - node.x;
+      const dy = y - node.y;
+      return (dx * dx) / (node.radiusX * node.radiusX) + (dy * dy) / (node.radiusY * node.radiusY) <= 1;
+    }
   }
 
   showInputField() {
@@ -300,9 +321,28 @@ class Canvas {
     const touch = e.touches[0];
     const mouseEvent = new MouseEvent('mousedown', {
       clientX: touch.clientX,
-      clientY: touch.clientY
+      clientY: touch.clientY,
     });
+
     this.canvas.dispatchEvent(mouseEvent);
+
+    //TODO fix
+    const pointerEvent = new PointerEvent('click', {
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+      pointerId: touch.identifier,
+      pointerType: 'touch',
+      isTrusted: true,
+      isPrimary: true,
+    });
+
+    // const windowClickEvent = new PointerEvent('click', {
+    //   clientX: touch.clientX,
+    //   clientY: touch.clientY,
+    //   pointerId: 2,
+    //   target: this.canvas,
+    // });
+    // window.dispatchEvent(windowClickEvent);
   }
 
   onTouchMove(e) {

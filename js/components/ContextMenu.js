@@ -3,6 +3,7 @@ class ContextMenu {
     this.inputField = inputField;
     this.canvas = canvas;
     this.contextMenuVisible = false;
+    this.contextMenuNodeTypeVisible = false;
     this.contextMenuX = 0;
     this.contextMenuY = 0;
     this.initEvents();
@@ -23,10 +24,12 @@ class ContextMenu {
 
     const x = e.offsetX;
     const y = e.offsetY;
-    const clickedNode = this.canvas.mindmap.nodes.find(node => this.canvas.isPointInNode(x, y, node));
+    const clickedNodes = [...this.canvas.mindmap.rectangleNodes, ...this.canvas.mindmap.ovalNodes]
+      .filter(node => this.canvas.isPointInNode(x, y, node))
+      .sort((a, b) => b.zIndex - a.zIndex);
 
-    if (clickedNode) {
-      this.canvas.selectedNode = clickedNode;
+    if (clickedNodes.length > 0) {
+      this.canvas.selectedNode = clickedNodes[0];
     } else {
       this.canvas.selectedNode = null;
     }
@@ -74,8 +77,6 @@ class ContextMenu {
       this.canvas.render();
     } else if (targetId === 'edit-node' && this.canvas.selectedNode) {
       this.canvas.showInputField();
-      // this.canvas.inputField.setValue(this.canvas.selectedNode.text);
-      // this.canvas.inputField.focus();
       this.canvas.render();
     } else if (targetId === 'connect-nodes') {
       this.canvas.connectingNodes = this.canvas.selectedNode;
@@ -84,16 +85,25 @@ class ContextMenu {
   }
 
   onWindowClick(e) {
-    if (!this.contextMenuVisible) return;
+    if (!this.contextMenuVisible && !this.contextMenuNodeTypeVisible) return;
+
+    const newNodeButton = document.getElementById('create-node-button');
+    const nodeTypeContextMenu = document.getElementById('node-type-context-menu');
+
+    if (window.innerWidth <= 768) {
+      if (!nodeTypeContextMenu.contains(e.target) && !newNodeButton.contains(e.target)) {
+        this.hideNodeTypeContextMenu();
+      }
+      return;
+    }
 
     const contextMenu = document.getElementById('context-menu');
-    const nodeTypeContextMenu = document.getElementById('node-type-context-menu');
     const isClickInsideContextMenu = contextMenu.contains(e.target);
 
     if (!isClickInsideContextMenu) {
       this.hideContextMenu();
     }
-    if (!nodeTypeContextMenu.contains(e.target)) {
+    if (!isClickInsideContextMenu && !nodeTypeContextMenu.contains(e.target) && !newNodeButton.contains(e.target)) {
       this.hideNodeTypeContextMenu();
     }
   }
@@ -102,19 +112,22 @@ class ContextMenu {
     this.contextMenuVisible = true;
     const targetId = e.target.id;
 
+    // Check if the device is in mobile view
+    const isMobileView = window.innerWidth <= 768;
+
+    // Use fixed coordinates for mobile view, else use click event coordinates
+    const x = isMobileView ? 150 : e.clientX;
+    const y = isMobileView ? 450 : e.clientY;
+
     let canvasOffset = this.canvas.canvas.getBoundingClientRect();
     if (targetId === 'create-rectangle-node') {
-      this.canvas.selectedNode = this.canvas.mindmap.addNodeRectangle('New Node', e.clientX - canvasOffset.x,
-        e.clientY - canvasOffset.y);
+      this.canvas.selectedNode = this.canvas.mindmap.addNodeRectangle('New Node', x - canvasOffset.x, y - canvasOffset.y);
     } else if (targetId === 'create-oval-node') {
-      this.canvas.selectedNode = this.canvas.mindmap.addNodeOval('New Node', e.clientX - canvasOffset.x,
-        e.clientY - canvasOffset.y);
+      this.canvas.selectedNode = this.canvas.mindmap.addNodeOval('New Node', x - canvasOffset.x, y - canvasOffset.y);
     } else {
       return;
     }
     this.canvas.showInputField();
-    // this.canvas.inputField.setValue(this.canvas.selectedNode.text);
-    // this.canvas.inputField.focus();
     this.canvas.render();
 
     this.hideNodeTypeContextMenu();
@@ -123,15 +136,15 @@ class ContextMenu {
   hideNodeTypeContextMenu() {
     const contextMenu = document.getElementById('node-type-context-menu');
     contextMenu.style.display = 'none';
-    this.contextMenuVisible = false;
+    this.contextMenuNodeTypeVisible = false;
   }
 
   showNodeTypeContextMenu(x, y) {
     const contextMenu = document.getElementById('node-type-context-menu');
-    contextMenu.style.display = 'block';
     contextMenu.style.left = `${x}px`;
     contextMenu.style.top = `${y}px`;
-    this.contextMenuVisible = true;
+    contextMenu.style.display = 'block';
+    this.contextMenuNodeTypeVisible = true;
   }
 }
 
