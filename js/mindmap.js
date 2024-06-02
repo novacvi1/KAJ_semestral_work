@@ -1,7 +1,7 @@
 import OvalNode from './components/OvalNode.js';
 import RectangleNode from './components/RectangleNode.js';
 import BaseNode from './components/BaseNode.js';
-import Connector from './components/connector.js';
+import Connector from './components/Connector.js';
 import Storage from './data/Storage.js';
 
 const storage = new Storage();

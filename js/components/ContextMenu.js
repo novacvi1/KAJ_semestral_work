@@ -121,9 +121,9 @@ class ContextMenu {
 
     let canvasOffset = this.canvas.canvas.getBoundingClientRect();
     if (targetId === 'create-rectangle-node') {
-      this.canvas.selectedNode = this.canvas.mindmap.addNodeRectangle('New Node', x - canvasOffset.x, y - canvasOffset.y);
+      this.canvas.selectedNode = this.canvas.mindmap.addNodeRectangle("New Node", x - canvasOffset.x, y - canvasOffset.y);
     } else if (targetId === 'create-oval-node') {
-      this.canvas.selectedNode = this.canvas.mindmap.addNodeOval('New Node', x - canvasOffset.x, y - canvasOffset.y);
+      this.canvas.selectedNode = this.canvas.mindmap.addNodeOval("New Node", x - canvasOffset.x, y - canvasOffset.y);
     } else {
       return;
     }

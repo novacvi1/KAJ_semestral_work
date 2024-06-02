@@ -200,13 +200,15 @@ class Canvas {
 
   onInputFieldEnterOrEscape(e) {
     if (e.key === 'Enter') {
-      if (this.inputField.getValue().length <= 100 && this.inputField.getValue().trim() !== '') {
+      if (this.selectedNode.type === 'oval') {
+        this.selectedNode.text = this.inputField.getValue().substring(0, 17);
+      } else if (this.inputField.getValue().length <= 100 && this.inputField.getValue().trim() !== '') {
         this.selectedNode.text = this.inputField.getValue();
-        try {
-          this.inputField.inputField.style.display = 'none';
-        } catch (e) {}
-        this.render();
       }
+      try {
+        this.inputField.inputField.style.display = 'none';
+      } catch (e) {}
+      this.render();
     }
     if (e.key === 'Escape') {
       this.onInputFieldBlur();
@@ -250,8 +252,13 @@ class Canvas {
     this.inputField.focus();
     this.inputField.inputField.addEventListener('input', () => {
       if (this.inputField.getValue().length <= 100 && this.inputField.getValue().trim() !== '') {
-        this.selectedNode.text = this.inputField.getValue();
-        this.render();
+        if (this.selectedNode.type === 'oval') {
+          this.selectedNode.text = this.inputField.getValue().substring(0, 17);
+          this.render();
+        } else {
+          this.selectedNode.text = this.inputField.getValue();
+          this.render();
+        }
       }
     });
     this.inputField.setValue(this.selectedNode.text);

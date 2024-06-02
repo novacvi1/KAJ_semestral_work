@@ -51,17 +51,17 @@
     </div>
   </div>
 </main>
-<section id="input-container">
+<div id="input-container">
   <label for="node-input" class="hidden-label">Node input:</label>
   <input type="text" id="node-input" class="node-input" required maxlength="100" minlength="1">
   <div id="input-error" style="display: none;"></div>
-</section>
+</div>
 <label for="file-input" class="hidden-label">Input file:</label>
 <input type="file" id="file-input" accept=".json"/>
 <pre id="output"></pre>
 <div id="error-modal" class="modal">
   <div class="modal-content">
-    <section class="close-button" id="close-error-button">&times;</section>
+    <div class="close-button" id="close-error-button">&times;</div>
     <h2>Error</h2>
     <p id="error-message"></p>
   </div>
@@ -85,23 +85,24 @@
   </ul>
 </div>
 <div id="info-popup">
-  <section id="close-popup">&times;</section>
+  <div id="close-popup">&times;</div>
   <h3>How to use Mindmap App</h3>
-  <section id="info-desktop-content">
+  <div id="info-desktop-content">
     <p>Double-click on canvas to create a new node.</p>
     <p>Double-clicking on node will give you option to change the text of the node.</p>
     <p>Press onto a node to move it.</p>
     <p>To connect two nodes right-click on the first one select "Connect Nodes" and then select the other one.</p>
     <p>Right-click onto a canvas or node for all options.</p>
+    <p>Select node and press Delete or Backspace to delete node.</p>
     <p>Buttons in navigations can clear the canvas, save canvas or load previously saved canvas.</p>
     <p>Also, you can drag and drop a saved canvas to load it.</p>
-  </section>
-  <section id="info-mobile-content">
+  </div>
+  <div id="info-mobile-content">
     <p>Select node you want to change and then use the button.</p>
     <p>Press onto a node to move it.</p>
     <p>To connect two nodes select the first one click "Connect Nodes" and then select the other one.</p>
     <p>Hamburger gives option to clear the canvas, save canvas or load previously saved canvas.</p>
-  </section>
+  </div>
 </div>
 <div id="network-status-popup"></div>
 <div id="loading-screen">

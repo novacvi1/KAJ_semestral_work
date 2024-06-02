@@ -1,5 +1,5 @@
 import MindMap from './mindmap.js';
-import Storage from './data/storage.js';
+import Storage from './data/Storage.js';
 import Canvas from './components/Canvas.js';
 
 const createNodeButton = document.getElementById('create-node-button');

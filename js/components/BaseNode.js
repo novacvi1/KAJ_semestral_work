@@ -8,7 +8,7 @@ const computedStyles = window.getComputedStyle(tempDiv);
 class BaseNode {
   constructor(text = 'New Node', x = 0, y = 0) {
     this.id = Date.now();
-    this.text = text;
+    this.text = String(text);
     this.x = x;
     this.y = y;
     this.height = 40;
@@ -91,7 +91,7 @@ class BaseNode {
 
   loadData(data) {
     this.id = data.id;
-    this.text = data.text;
+    this.text = String(data.text);
     this.x = data.x;
     this.y = data.y;
     this.width = data.width;
