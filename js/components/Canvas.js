@@ -223,7 +223,8 @@ class Canvas {
   }
 
   newMap() {
-    this.mindmap.nodes = [];
+    this.mindmap.rectangleNodes = [];
+    this.mindmap.ovalNodes = [];
     this.mindmap.connectors = [];
     localStorage.removeItem('canvasState');
     this.render();
@@ -324,7 +325,6 @@ class Canvas {
   }
 
   onTouchStart(e) {
-    e.preventDefault();
     const touch = e.touches[0];
     const mouseEvent = new MouseEvent('mousedown', {
       clientX: touch.clientX,
@@ -332,28 +332,12 @@ class Canvas {
     });
 
     this.canvas.dispatchEvent(mouseEvent);
-
-    //TODO fix
-    const pointerEvent = new PointerEvent('click', {
-      clientX: touch.clientX,
-      clientY: touch.clientY,
-      pointerId: touch.identifier,
-      pointerType: 'touch',
-      isTrusted: true,
-      isPrimary: true,
-    });
-
-    // const windowClickEvent = new PointerEvent('click', {
-    //   clientX: touch.clientX,
-    //   clientY: touch.clientY,
-    //   pointerId: 2,
-    //   target: this.canvas,
-    // });
-    // window.dispatchEvent(windowClickEvent);
   }
 
   onTouchMove(e) {
-    e.preventDefault();
+    if (e.cancelable) {
+      e.preventDefault();
+    }
     const touch = e.touches[0];
     const mouseEvent = new MouseEvent('mousemove', {
       clientX: touch.clientX,
@@ -362,8 +346,7 @@ class Canvas {
     this.canvas.dispatchEvent(mouseEvent);
   }
 
-  onTouchEnd(e) {
-    e.preventDefault();
+  onTouchEnd() {
     const mouseEvent = new MouseEvent('mouseup', {});
     this.canvas.dispatchEvent(mouseEvent);
   }
